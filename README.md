@@ -6,6 +6,7 @@ Various tools and wrappers I use regularly to simplify HTML/CSS/JavaScript web d
 
 ## Tools
 
+- [**HTML Element Plus**](./html-element-plus/README.md): HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
 - [**Remedy CSS**](./remedy-css/README.md): A slightly modified version of [Jen Simmon's CSS Remedy](https://github.com/jensimmons/cssremedy), a simple CSS reset.
 
 ## Licenses

@@ -22,6 +22,42 @@ export default class HTMLElementPlus extends HTMLElement {
         this.#initRefAccess();
     }
 
+    // region: TYPE HINTS FOR CUSTOM ELEMENT FUNCTIONS
+
+    /** Invoked when the custom element is first connected to the document's DOM. */
+    connectedCallback() {
+        /*empty*/
+    }
+
+    /** Invoked when the custom element is disconnected from the document's DOM. */
+    disconnectedCallback() {
+        /*empty*/
+    }
+
+    /** Invoked when the element is moved to a different place in the DOM via Element.moveBefore(). */
+    connectedMoveCallback() {
+        /*empty*/
+    }
+
+    /** Invoked when the custom element is moved to a new document. */
+    adoptedCallback() {
+        /*empty*/
+    }
+
+    /* eslint-disable no-unused-vars -- REASON */
+    /**
+     * Invoked when one of the custom element's attributes is added, removed, or changed.
+     *
+     * @param {string} name Name of the attribute which changed.
+     * @param {string} oldValue Value of the attribute before the change.
+     * @param {string} newValue Value of the attribute after the change.
+     */
+    attributeChangedCallback(name, oldValue, newValue) {
+        /*empty*/
+    }
+    /* eslint-enable no-unused-vars */
+
+    // endregion
     // region: REFERENCE ELEMENTS
 
     /**

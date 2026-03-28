@@ -41,6 +41,12 @@ The reference element is returned dynamically and will reflect any changes made 
 > ⚠️ **Duplicate Ref Values**  
 > If the custom element has multiple ref attributes with the same value, only the first one will be located.
 
+### Connected Callback Skipped on Move
+
+When the custom element is moved using `Element.moveBefore()`, the _connectedCallback_ method will no longer be invoked, instead invoking the _connectedMoveCallback_ method. This most likely matches the behaviour desired by most web component authors; see [MDN's Lifecycle callbacks and state-preserving moves](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#lifecycle_callbacks_and_state-preserving_moves) for more details.
+
+To return to the original behaviour, simply delete the empty _connectedMoveCallback_ method from the HTMLElementPlus class which was implemented as part of the JSDoc type hints for [custom element life cycle callbacks](#custom-element-life-cycle-callbacks).
+
 ## JSDoc Type Hints
 
 The HTMLElementPlus class is fully typed and documented using JSDoc. To bring the types and documentation over into your code in Visual Studio Code:
@@ -56,3 +62,7 @@ The HTMLElementPlus class is fully typed and documented using JSDoc. To bring th
         }
     }
     ```
+
+### Custom Element Life Cycle Callbacks
+
+The life cycle callback methods (e.g. connectedCallback, attributeChangedCallback) are defined as empty methods in the HTMLElementPlus class to provide auto-complete capabilities as well as typing for the _attributeChangedCallback_ method.

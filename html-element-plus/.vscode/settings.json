@@ -1,0 +1,230 @@
+// Shared Configuration File
+// Version: DB-2026-01-16
+
+// spell-checker:words arcgispro, dorzey, fstring, pgsql, sqlfluff
+
+{
+	"css.lint.ieHack": "error",                  // Give error when using an Internet Explorer hack
+    "css.lint.compatibleVendorPrefixes": "warning",  // When vender prefix, ensure all other prefixes used
+    "css.lint.fontFaceProperties": "error",      // Missing src or font-family property in @font-face
+    "css.lint.hexColorLength": "error",          // Hex colours must be 3 or 6 characters long
+    "css.lint.important": "warning",             // Use of !important in the CSS
+    "css.lint.propertyIgnoredDueToDisplay": "warning",  // Warn property gets ignored due to display value
+    "css.lint.unknownProperties": "warning",     // Warn when using a property not known to linter
+    "css.lint.vendorPrefix": "warning",          // Require non-prefixed when using vendor prefixed
+    "css.validate": true,                        // Enable CSS linting
+
+
+    "editor.detectIndentation": false,           // Controls overriding of editor.tabSize and editor
+                                                 //     .insertSpaces by indentation in current file.
+    "editor.formatOnSave": false,                // Whether to format the entire file when saving.
+    "editor.insertSpaces": true,                 // Whether to insert spaces in the place of tabs.
+    "editor.tabSize": 4,                         // Number of spaces a tab key-press is equal to.
+
+
+    "files.associations": {                      // Associate file extensions to file type.
+        ".log": "plaintext",                         // Python log files
+        ".log.*": "plaintext",                       // Python rollover log files
+        "*.pyt": "python",                           // ArcGIS Python Toolboxes
+        "*pipeline*.{yaml,yml}": "azure-pipelines"   // Azure Pipeline configurations
+    },
+    "files.encoding": "utf8",                    // Default encoding for new and existing files.
+    "files.eol": "\n",                           // Default end of line character. Unix style provides
+                                                 //    maximum compatibility.
+    "files.insertFinalNewline": false,           // Insert a final newline when file is saved.
+    "files.trimFinalNewlines": false,            // Trim all empty lines at end of file when saved.
+    "files.trimTrailingWhitespace": true,        // Trim trailing whitespace when saving a file
+
+
+    "html.validate.scripts": true,               // Lint script tag content in HTML
+    "html.validate.styles": true,                // Lint style tag content in HTML
+
+
+    "js/ts.validate.enabled": false,            // Turn off built in validator - use eslint instead
+
+
+    "markdown.validate.enabled": true,          // Validate links in markdown files
+    "markdown.validate.fileLinks.enabled": "warning",  // Validate links to files
+    "markdown.validate.fileLinks.markdownFragmentLinks": "warning",  // Validate anchor links on same page
+    "markdown.validate.fragmentLinks.enabled": "warning",  // Validate anchor links in different files
+
+
+    // FILE TYPE SPECIFIC
+
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+
+    "[markdown]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+        "files.trimTrailingWhitespace": false    // Whitespace at eol are control chars in .md.
+    },
+
+    "[powershell]": {
+        "editor.defaultFormatter": "ms-vscode.powershell",
+        "editor.formatOnSave": true
+    },
+
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
+
+    "[sql]": {
+        "editor.defaultFormatter": "dorzey.vscode-sqlfluff",
+        "editor.formatOnSave": true
+    },
+
+    "[toml]": {
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "tamasfe.even-better-toml",
+        "editor.formatOnSave": true
+    },
+
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    "[yaml][azure-pipelines]": {
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+
+    // EXTENSIONS
+
+    "autoDocstring.docstringFormat": "google",   // Use Google format docstring in Python
+    "autoDocstring.includeName": false,          // Do not include element name in docstring
+    "autoDocstring.quoteStyle": "\"\"\"",        // Use 3 double quotes for docstrings
+
+
+    "black-formatter.args": [
+        "--line-length", "120",
+        "--target-version", "py311"
+    ],
+
+
+    "cSpell.language": "en,en-CA,en-GB,fr,fr-90",// Make use of all 3 English dictionaries
+    "cSpell.caseSensitive": false,               // Spell-check is not case sensitive
+    // "cSpell.customDictionaries": {               // Custom dictionaries importing GFX and GIS terms
+    //     "my-dictionary": {
+    //         "name": "Name",
+    //         "path": "${workspaceFolder}/.vscode/dictionary.txt",
+    //         "scope": "workspace",
+    //         "addWords": false
+    //     },
+    //     "custom": true,
+    //     "internal-terms": false
+    // },
+    "cSpell.ignorePaths": [
+        ".git/{index,*refs,*HEAD}",
+        ".git/{info,lfs,logs,refs,objects}/**",
+        ".vscode-insiders",
+        ".vscode",
+        "node_modules",
+        "package-lock.json",
+        "packages.json",
+        "vscode-extension"
+    ],
+    // ↓↓ Project specific words to ignore when spell-checking (but not suggest)
+    "cSpell.ignoreWords": [],
+    // ↓↓ Project specific words to allow and suggest when spell-checking
+    "cSpell.words": [],
+
+
+    "eslint.enable": true,                       // Enable ESLint on Javascript/Typescript files
+    "eslint.options": {                          // Set config location
+        "overrideConfigFile": "eslint.config.js"
+    },
+    "eslint.useFlatConfig": true,                // Use the new Flat Config format
+    "eslint.validate": ["javascript"],
+
+    "evenBetterToml.formatter.trailingNewline": false, // Match other formatters by excluding new line at end of file
+
+
+    "isort.args": ["--profile", "black"],
+
+
+    "jsdoc-generator.includeAsync": true,        // Include @async tag
+    "jsdoc-generator.includeExport": true,       // Include @export tag
+    "jsdoc-generator.includeParenthesisForMultipleTypes": true,  // Wrap multiple types in parenthesis
+    "jsdoc-generator.includeTypes": true,        // Include typing when possible
+    "jsdoc-generator.tagDescriptionColumnStart": 0,  // Start description at column 0
+    "jsdoc-generator.tagNameColumnStart": 0,     // Start names at column 0
+    "jsdoc-generator.tagValueColumnStart": 0,    // Start values at column 0
+
+
+    "markdownlint.config": {                     // Adjust rules for Markdown linting
+        "code-block-style": { "style": "fenced" },  // Code blocks use 3 ticks: ```
+        "emphasis-style": { "style": "underscore" },  // Italic text uses underscores
+        "heading-style": { "style": "atx" },     // Use # for headings
+        "line-length": false,                    // Do not enforce line lengths
+        "no-blanks-blockquote": false,           // Allowed as supported by VSCode, ADO, and Docsify
+        "strong-style": { "style": "asterisk" },  // Bold text uses two asterisks
+        "ul-style": { "style": "dash" },          // Use dashes for bullets
+        "table-column-style": {"enabled": false} // Style-only rule newly added to linter - causes trouble with existing
+    },
+
+
+    "pgsql.intelliSense.enableErrorChecking": true, // Ensure SQL code validated for PostgreSQL
+
+
+    "powershell.scriptAnalysis.enable": true,    // Check for problems in PowerShell files
+    "powershell.startAutomatically": true,       // Ensure code validation for powershell runs by default
+
+
+    "prettier.configPath": ".vscode/.prettierrc.yaml", // Location of configuration file for Prettier formatter
+
+
+    // Pylint rules moved to pyproject.toml
+
+
+    // ↓↓ To be enabled when using ArcGIS Pro's Python for debugging
+    // "python.defaultInterpreterPath": "C:\\Program Files\\ArcGIS\\Pro\\bin\\Python\\envs\\arcgispro-py3\\python.exe",
+    "python.envFile": "${workspaceFolder}/.venv", // Path for automatically created virtual env
+    "python.testing.pytestArgs": [
+        "tests"                                  // Folder in which the tests are located
+        // ↓↓ To be enabled only when running approval tests ↓↓
+        //"--approvaltests-use-reporter='PythonNative'",
+    ],
+    "python.testing.unittestEnabled": false,      // We don't use unittest, enable pytest below instead
+    "python.testing.pytestEnabled": true,       // Enable when pytest is used for unit testing
+
+    // PYRIGHT WITHIN PYLANCE
+    "python.languageServer": "Pylance",
+    // pyright settings moved to pyproject.toml
+
+
+    "sqlfluff.config": "${workspaceFolder}/.vscode/sqlfluff.ini",  // Location of rules config file for SQL linting
+    "sqlfluff.dbtInterface.enabled": false,      // Use regular SQL, not DBT
+    // ↓ Assumes SQLFluff is installed in virtual environment ↓
+    "sqlfluff.executablePath": "${workspaceFolder}/.venv/Scripts/sqlfluff.exe",
+    "sqlfluff.linter.run": "onType"              // Get linting information on typing
+
+
+    // ===== PROJECT SPECIFIC CONFIGURATIONS =====
+    // (some settings may also have been modified above)
+}

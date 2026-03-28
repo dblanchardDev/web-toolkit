@@ -1,0 +1,338 @@
+// List of snippets (coding templates) commonly used.
+//
+// Version: DB-2025-03-28
+
+{
+    // ===== HEADER COMMENTS =====
+
+    "Header Comment - Python": {
+        "isFileTemplate": true,
+        "description": "Comment at start of Python files.",
+        "scope": "python",
+        "body": [
+            "\"\"\"${1:SUMMARY}.",
+            "",
+            "Created:",
+            "    $CURRENT_MONTH_NAME $CURRENT_YEAR",
+            "",
+            "Copyright:",
+            "   Copyright $CURRENT_YEAR David Blanchard. All rights reserved.",
+            "    The content of this file must not be copied or reproduced in any manner",
+            "    without the express permission of David Blanchard.",
+            "\"\"\""
+        ]
+    },
+
+    "Header Comment - HTML": {
+        "isFileTemplate": true,
+        "description": "Comment at start of HTML files.",
+        "scope": "html",
+        "body": [
+            "<!--",
+            "    ${1:SUMMARY}",
+            "",
+            "    Created: $CURRENT_MONTH_NAME $CURRENT_YEAR",
+            "",
+            "    Copyright $CURRENT_YEAR David Blanchard. All rights reserved.",
+            "    The content of this file must not be copied or reproduced in any manner",
+            "    without the express permission of David Blanchard.",
+            "-->"
+        ]
+    },
+
+    "Header Comment - CSS": {
+        "isFileTemplate": true,
+        "description": "Comment at start of CSS files.",
+        "scope": "css",
+        "body": [
+            "/*",
+            "    ${1:SUMMARY}",
+            "",
+            "    Created: $CURRENT_MONTH_NAME $CURRENT_YEAR",
+            "",
+            "    Copyright $CURRENT_YEAR David Blanchard. All rights reserved.",
+            "    The content of this file must not be copied or reproduced in any manner",
+            "    without the express permission of David Blanchard.",
+            "*/"
+        ]
+    },
+
+    "Header Comment - JavaScript": {
+        "isFileTemplate": true,
+        "description": "Comment at start of JavaScript files.",
+        "scope": "javascript,typescript,javascriptreact,typescriptreact,vue",
+        "body": [
+            "/**",
+            " * @file ${1:SUMMARY}",
+            " *",
+            " * @since $CURRENT_MONTH_NAME $CURRENT_YEAR",
+            " *",
+            " * @copyright Copyright $CURRENT_YEAR David Blanchard. All rights reserved.",
+            " *     The content of this file must not be copied or reproduced in any manner",
+            " *     without the express permission of David Blanchard.",
+            " */",
+        ]
+    },
+
+    "Header Comment - SQL": {
+        "isFileTemplate": true,
+        "description": "Comment at start of SQL files.",
+        "scope": "sql",
+        "body": [
+            "/*",
+            "${1:SUMMARY}",
+            "",
+            "Created: $CURRENT_MONTH_NAME $CURRENT_YEAR",
+            "",
+            "Copyright $CURRENT_YEAR David Blanchard. All rights reserved.",
+            "The content of this file must not be copied or reproduced in any manner",
+            "without the express permission of David Blanchard.",
+            "*/",
+        ]
+    },
+
+    "Header Comment - PowerShell": {
+        "isFileTemplate": true,
+        "description": "Comment at start of PowerShell files.",
+        "scope": "powershell",
+        "body": [
+            "<#",
+            ".SYNOPSIS",
+            "${1:SUMMARY}",
+            "",
+            ".NOTES",
+            "Created: $CURRENT_MONTH_NAME $CURRENT_YEAR",
+            "",
+            "Copyright $CURRENT_YEAR David Blanchard. All rights reserved.",
+            "The content of this file must not be copied or reproduced in any manner",
+            "without the express permission of David Blanchard.",
+            "#>"
+        ]
+    },
+
+    "Header Comment - YAML / TOML": {
+        "isFileTemplate": true,
+        "description": "Comment at start of YAML/Pipeline/TOML files.",
+        "scope": "yaml,azure-pipelines,toml",
+        "body": [
+            "# ${1:SUMMARY}",
+            "#",
+            "# Created: $CURRENT_MONTH_NAME $CURRENT_YEAR",
+            "",
+            "# Copyright $CURRENT_YEAR David Blanchard. All rights reserved.",
+            "# The content of this file must not be copied or reproduced in any manner",
+            "# without the express permission of David Blanchard."
+        ]
+    },
+
+
+    // ===== BLACK FORMATTER COMMENTS =====
+    "Black: Skip Line": {
+        "description": "Do not format the current line with Black.",
+        "prefix": "black",
+        "scope": "python",
+        "body": "# fmt: skip"
+    },
+
+    "Black: Skip Block": {
+        "description": "Do not format the encapsulated block.",
+        "prefix": "black",
+        "scope": "python",
+        "body": [
+            "# fmt: off",
+            "$TM_SELECTED_TEXT",
+            "# fmt: on",
+        ]
+    },
+
+
+    // ===== ESLINT COMMENTS =====
+    "ESLint: Disable Block": {
+        "description": "Disable ESLint Rule(s) until enabled again.",
+        "prefix": "eslint",
+        "scope": "javascript,typescript,javascriptreact,typescriptreact,vue",
+        "body": [
+            "/* eslint-disable ${1|accessor-pairs,array-callback-return,arrow-body-style,block-scoped-var,camelcase,capitalized-comments,class-methods-use-this,complexity,consistent-return,consistent-this,constructor-super,curly,default-case,default-case-last,default-param-last,dot-notation,eqeqeq,for-direction,func-name-matching,func-names,func-style,getter-return,grouped-accessor-pairs,guard-for-in,id-denylist,id-length,id-match,init-declarations,logical-assignment-operators,max-classes-per-file,max-depth,max-lines,max-lines-per-function,max-nested-callbacks,max-params,max-statements,new-cap,no-alert,no-array-constructor,no-async-promise-executor,no-await-in-loop,no-bitwise,no-caller,no-case-declarations,no-class-assign,no-compare-neg-zero,no-cond-assign,no-console,no-const-assign,no-constant-binary-expression,no-constant-condition,no-constructor-return,no-continue,no-control-regex,no-debugger,no-delete-var,no-div-regex,no-dupe-args,no-dupe-class-members,no-dupe-else-if,no-dupe-keys,no-duplicate-case,no-duplicate-imports,no-else-return,no-empty,no-empty-character-class,no-empty-function,no-empty-pattern,no-empty-static-block,no-eq-null,no-eval,no-ex-assign,no-extend-native,no-extra-bind,no-extra-boolean-cast,no-extra-label,no-fallthrough,no-func-assign,no-global-assign,no-implicit-coercion,no-implicit-globals,no-implied-eval,no-import-assign,no-inline-comments,no-inner-declarations,no-invalid-regexp,no-invalid-this,no-irregular-whitespace,no-iterator,no-label-var,no-labels,no-lone-blocks,no-lonely-if,no-loop-func,no-loss-of-precision,no-magic-numbers,no-misleading-character-class,no-multi-assign,no-multi-str,no-negated-condition,no-nested-ternary,no-new,no-new-func,no-new-native-nonconstructor,no-new-wrappers,no-nonoctal-decimal-escape,no-obj-calls,no-object-constructor,no-octal,no-octal-escape,no-param-reassign,no-plusplus,no-promise-executor-return,no-proto,no-prototype-builtins,no-redeclare,no-regex-spaces,no-restricted-exports,no-restricted-globals,no-restricted-imports,no-restricted-properties,no-restricted-syntax,no-return-assign,no-script-url,no-self-assign,no-self-compare,no-sequences,no-setter-return,no-shadow,no-shadow-restricted-names,no-sparse-arrays,no-template-curly-in-string,no-ternary,no-this-before-super,no-throw-literal,no-undef,no-undef-init,no-undefined,no-underscore-dangle,no-unexpected-multiline,no-unmodified-loop-condition,no-unneeded-ternary,no-unreachable,no-unreachable-loop,no-unsafe-finally,no-unsafe-negation,no-unsafe-optional-chaining,no-unused-expressions,no-unused-labels,no-unused-private-class-members,no-unused-vars,no-use-before-define,no-useless-assignment,no-useless-backreference,no-useless-call,no-useless-catch,no-useless-computed-key,no-useless-concat,no-useless-constructor,no-useless-escape,no-useless-rename,no-useless-return,no-var,no-void,no-warning-comments,no-with,object-shorthand,one-var,operator-assignment,prefer-arrow-callback,prefer-const,prefer-destructuring,prefer-exponentiation-operator,prefer-named-capture-group,prefer-numeric-literals,prefer-object-has-own,prefer-object-spread,prefer-promise-reject-errors,prefer-regex-literals,prefer-rest-params,prefer-spread,prefer-template,radix,require-atomic-updates,require-await,require-unicode-regexp,require-yield,semi,sort-imports,sort-keys,sort-vars,strict,symbol-description,unicode-bom,use-isnan,valid-typeof,vars-on-top,yoda|} -- ${2:REASON} */",
+            "$TM_SELECTED_TEXT",
+            "/* eslint-enable ${1} */"
+        ]
+    },
+    "ESLint: Disable Line": {
+        "description": "Disable ESLint Rule(s) on the current line.",
+        "prefix": "eslint",
+        "scope": "javascript,typescript,javascriptreact,typescriptreact,vue",
+        "body": "// eslint-disable-line ${1|accessor-pairs,array-callback-return,arrow-body-style,block-scoped-var,camelcase,capitalized-comments,class-methods-use-this,complexity,consistent-return,consistent-this,constructor-super,curly,default-case,default-case-last,default-param-last,dot-notation,eqeqeq,for-direction,func-name-matching,func-names,func-style,getter-return,grouped-accessor-pairs,guard-for-in,id-denylist,id-length,id-match,init-declarations,logical-assignment-operators,max-classes-per-file,max-depth,max-lines,max-lines-per-function,max-nested-callbacks,max-params,max-statements,new-cap,no-alert,no-array-constructor,no-async-promise-executor,no-await-in-loop,no-bitwise,no-caller,no-case-declarations,no-class-assign,no-compare-neg-zero,no-cond-assign,no-console,no-const-assign,no-constant-binary-expression,no-constant-condition,no-constructor-return,no-continue,no-control-regex,no-debugger,no-delete-var,no-div-regex,no-dupe-args,no-dupe-class-members,no-dupe-else-if,no-dupe-keys,no-duplicate-case,no-duplicate-imports,no-else-return,no-empty,no-empty-character-class,no-empty-function,no-empty-pattern,no-empty-static-block,no-eq-null,no-eval,no-ex-assign,no-extend-native,no-extra-bind,no-extra-boolean-cast,no-extra-label,no-fallthrough,no-func-assign,no-global-assign,no-implicit-coercion,no-implicit-globals,no-implied-eval,no-import-assign,no-inline-comments,no-inner-declarations,no-invalid-regexp,no-invalid-this,no-irregular-whitespace,no-iterator,no-label-var,no-labels,no-lone-blocks,no-lonely-if,no-loop-func,no-loss-of-precision,no-magic-numbers,no-misleading-character-class,no-multi-assign,no-multi-str,no-negated-condition,no-nested-ternary,no-new,no-new-func,no-new-native-nonconstructor,no-new-wrappers,no-nonoctal-decimal-escape,no-obj-calls,no-object-constructor,no-octal,no-octal-escape,no-param-reassign,no-plusplus,no-promise-executor-return,no-proto,no-prototype-builtins,no-redeclare,no-regex-spaces,no-restricted-exports,no-restricted-globals,no-restricted-imports,no-restricted-properties,no-restricted-syntax,no-return-assign,no-script-url,no-self-assign,no-self-compare,no-sequences,no-setter-return,no-shadow,no-shadow-restricted-names,no-sparse-arrays,no-template-curly-in-string,no-ternary,no-this-before-super,no-throw-literal,no-undef,no-undef-init,no-undefined,no-underscore-dangle,no-unexpected-multiline,no-unmodified-loop-condition,no-unneeded-ternary,no-unreachable,no-unreachable-loop,no-unsafe-finally,no-unsafe-negation,no-unsafe-optional-chaining,no-unused-expressions,no-unused-labels,no-unused-private-class-members,no-unused-vars,no-use-before-define,no-useless-assignment,no-useless-backreference,no-useless-call,no-useless-catch,no-useless-computed-key,no-useless-concat,no-useless-constructor,no-useless-escape,no-useless-rename,no-useless-return,no-var,no-void,no-warning-comments,no-with,object-shorthand,one-var,operator-assignment,prefer-arrow-callback,prefer-const,prefer-destructuring,prefer-exponentiation-operator,prefer-named-capture-group,prefer-numeric-literals,prefer-object-has-own,prefer-object-spread,prefer-promise-reject-errors,prefer-regex-literals,prefer-rest-params,prefer-spread,prefer-template,radix,require-atomic-updates,require-await,require-unicode-regexp,require-yield,semi,sort-imports,sort-keys,sort-vars,strict,symbol-description,unicode-bom,use-isnan,valid-typeof,vars-on-top,yoda|} -- ${2:REASON}"
+    },
+
+    "ESLint: Disable Next Line": {
+        "description": "Disable ESLint Rule(s) on the next line.",
+        "prefix": "eslint",
+        "scope": "javascript,typescript,javascriptreact,typescriptreact,vue",
+        "body": "// eslint-disable-next-line ${1|accessor-pairs,array-callback-return,arrow-body-style,block-scoped-var,camelcase,capitalized-comments,class-methods-use-this,complexity,consistent-return,consistent-this,constructor-super,curly,default-case,default-case-last,default-param-last,dot-notation,eqeqeq,for-direction,func-name-matching,func-names,func-style,getter-return,grouped-accessor-pairs,guard-for-in,id-denylist,id-length,id-match,init-declarations,logical-assignment-operators,max-classes-per-file,max-depth,max-lines,max-lines-per-function,max-nested-callbacks,max-params,max-statements,new-cap,no-alert,no-array-constructor,no-async-promise-executor,no-await-in-loop,no-bitwise,no-caller,no-case-declarations,no-class-assign,no-compare-neg-zero,no-cond-assign,no-console,no-const-assign,no-constant-binary-expression,no-constant-condition,no-constructor-return,no-continue,no-control-regex,no-debugger,no-delete-var,no-div-regex,no-dupe-args,no-dupe-class-members,no-dupe-else-if,no-dupe-keys,no-duplicate-case,no-duplicate-imports,no-else-return,no-empty,no-empty-character-class,no-empty-function,no-empty-pattern,no-empty-static-block,no-eq-null,no-eval,no-ex-assign,no-extend-native,no-extra-bind,no-extra-boolean-cast,no-extra-label,no-fallthrough,no-func-assign,no-global-assign,no-implicit-coercion,no-implicit-globals,no-implied-eval,no-import-assign,no-inline-comments,no-inner-declarations,no-invalid-regexp,no-invalid-this,no-irregular-whitespace,no-iterator,no-label-var,no-labels,no-lone-blocks,no-lonely-if,no-loop-func,no-loss-of-precision,no-magic-numbers,no-misleading-character-class,no-multi-assign,no-multi-str,no-negated-condition,no-nested-ternary,no-new,no-new-func,no-new-native-nonconstructor,no-new-wrappers,no-nonoctal-decimal-escape,no-obj-calls,no-object-constructor,no-octal,no-octal-escape,no-param-reassign,no-plusplus,no-promise-executor-return,no-proto,no-prototype-builtins,no-redeclare,no-regex-spaces,no-restricted-exports,no-restricted-globals,no-restricted-imports,no-restricted-properties,no-restricted-syntax,no-return-assign,no-script-url,no-self-assign,no-self-compare,no-sequences,no-setter-return,no-shadow,no-shadow-restricted-names,no-sparse-arrays,no-template-curly-in-string,no-ternary,no-this-before-super,no-throw-literal,no-undef,no-undef-init,no-undefined,no-underscore-dangle,no-unexpected-multiline,no-unmodified-loop-condition,no-unneeded-ternary,no-unreachable,no-unreachable-loop,no-unsafe-finally,no-unsafe-negation,no-unsafe-optional-chaining,no-unused-expressions,no-unused-labels,no-unused-private-class-members,no-unused-vars,no-use-before-define,no-useless-assignment,no-useless-backreference,no-useless-call,no-useless-catch,no-useless-computed-key,no-useless-concat,no-useless-constructor,no-useless-escape,no-useless-rename,no-useless-return,no-var,no-void,no-warning-comments,no-with,object-shorthand,one-var,operator-assignment,prefer-arrow-callback,prefer-const,prefer-destructuring,prefer-exponentiation-operator,prefer-named-capture-group,prefer-numeric-literals,prefer-object-has-own,prefer-object-spread,prefer-promise-reject-errors,prefer-regex-literals,prefer-rest-params,prefer-spread,prefer-template,radix,require-atomic-updates,require-await,require-unicode-regexp,require-yield,semi,sort-imports,sort-keys,sort-vars,strict,symbol-description,unicode-bom,use-isnan,valid-typeof,vars-on-top,yoda|} -- ${2:REASON}"
+    },
+
+    "ESLint: Specify Globals": {
+        "description": "Provide list of global variables accessible from this file only.",
+        "prefix": "eslint",
+        "scope": "javascript,typescript,javascriptreact,typescriptreact,vue",
+        "body": "/* global ${1:variable1}, ${2:variable2} */"
+    },
+
+
+    // ===== PRETTIER IGNORE COMMENTS =====
+    "Prettier: Ignore Next Node (CSS)": {
+        "description": "Exclude the next node from formatting.",
+        "prefix": "prettier",
+        "scope": "css,sass,scss",
+        "body": "/* prettier-ignore */"
+    },
+
+    "Prettier: Ignore Next Node (HTML)": {
+        "description": "Exclude the next node from formatting.",
+        "prefix": "prettier",
+        "scope": "html",
+        "body": "<!-- prettier-ignore -->"
+    },
+
+    "Prettier: Ignore Next Node (JS)": {
+        "description": "Exclude the next node from formatting.",
+        "prefix": "prettier",
+        "scope": "javascript,typescript,javascriptreact,typescriptreact,vue",
+        "body": "// prettier-ignore"
+    },
+
+
+    // ===== PYLINT MESSAGE CONTROL =====
+    "Pylint: Disable Block": {
+        "description": "Disable Pylint rule for the current scope.",
+        "prefix": "pylint",
+        "scope": "python",
+        "body": [
+            "# pylint; reason=${2:REASON}",
+            "# pylint: disable=${1|abstract-class-instantiated,abstract-method,access-member-before-definition,all,anomalous-backslash-in-string,anomalous-unicode-escape-in-string,arguments-differ,arguments-out-of-order,arguments-renamed,assert-on-string-literal,assert-on-tuple,assigning-non-slot,assignment-from-no-return,assignment-from-none,astroid-error,async,attribute-defined-outside-init,await-outside-async,bad-builtin,bad-chained-comparison,bad-chained-comparison,bad-classmethod-argument,bad-configuration-section,bad-context-manager,bad-docstring-quotes,bad-dunder-name,bad-except-order,bad-exception-cause,bad-exception-context,bad-file-encoding,bad-format-character,bad-format-string,bad-format-string-key,bad-indentation,bad-inline-option,bad-mcs-classmethod-argument,bad-mcs-method-argument,bad-open-mode,bad-option-value,bad-plugin-value,bad-reversed-sequence,bad-staticmethod-argument,bad-str-strip-call,bad-string-format-type,bad-super-call,bad-thread-instantiation,bare-except,basic,bidirectional-unicode,binary-op-exception,blacklisted-name,boolean-datetime,broad-except,broad-exception-caught,broad-exception-raised,broken-collections-callable,broken-noreturn,c,c-extension-no-member,cache-max-size-none,catching-non-exception,cell-var-from-loop,chained-comparison,class-variable-slots-conflict,classes,compare-to-empty-string,compare-to-zero,comparison-of-constants,comparison-with-callable,comparison-with-itself,condition-evals-to-constant,config-parse-error,confusing-consecutive-elif,confusing-with-statement,consider-alternative-union-syntax,consider-iterating-dictionary,consider-merging-isinstance,consider-refactoring-into-while-condition,consider-swap-variables,consider-ternary-expression,consider-using-alias,consider-using-any-or-all,consider-using-assignment-expr,consider-using-augmented-assign,consider-using-dict-comprehension,consider-using-dict-items,consider-using-enumerate,consider-using-f-string,consider-using-from-import,consider-using-generator,consider-using-get,consider-using-in,consider-using-join,consider-using-max-builtin,consider-using-min-builtin,consider-using-namedtuple-or-dataclass,consider-using-set-comprehension,consider-using-sys-exit,consider-using-ternary,consider-using-tuple,consider-using-with,contextmanager-generator-missing-cleanup,continue-in-finally,cyclic-import,dangerous-default-value,dataclass,declare-non-slot,deprecated-argument,deprecated-attribute,deprecated-class,deprecated-decorator,deprecated-method,deprecated-module,deprecated-pragma,deprecated-typing-alias,design,dict-init-mutate,dict-iter-missing-items,differing-param-doc,differing-type-doc,disallowed-name,docstring-first-line-empty,duplicate-argument-name,duplicate-bases,duplicate-code,duplicate-except,duplicate-key,duplicate-string-formatting-argument,duplicate-value,e,else-if-used,empty-comment,empty-docstring,eq-without-hash,eval-used,exceptions,exec-used,expression-not-assigned,f,f-string-without-interpolation,fatal,file-ignored,fixme,forgotten-debug-statement,format,format-combined-specification,format-needs-mapping,format-string-without-interpolation,function-redefined,global-at-module-level,global-statement,global-variable-not-assigned,global-variable-undefined,implicit-flag-alias,implicit-str-concat,implicit-str-concat-in-sequence,import-error,import-outside-toplevel,import-private-name,import-self,imports,inconsistent-mro,inconsistent-quotes,inconsistent-return-statements,inherit-non-class,init-is-generator,invalid-all-format,invalid-all-object,invalid-bool-returned,invalid-bytes-returned,invalid-character-backspace,invalid-character-carriage-return,invalid-character-esc,invalid-character-nul,invalid-character-sub,invalid-character-zero-width-space,invalid-characters-in-docstring,invalid-class-object,invalid-enum-extension,invalid-envvar-default,invalid-envvar-value,invalid-field-call,invalid-format-index,invalid-format-returned,invalid-getnewargs-ex-returned,invalid-getnewargs-returned,invalid-hash-returned,invalid-index-returned,invalid-length-hint-returned,invalid-length-returned,invalid-metaclass,invalid-name,invalid-overridden-method,invalid-repr-returned,invalid-sequence-index,invalid-slice-index,invalid-slice-step,invalid-slots,invalid-slots-object,invalid-star-assignment-target,invalid-str-returned,invalid-unary-operand-type,invalid-unicode-codec,isinstance-second-argument-not-valid-type,keyword-arg-before-vararg,kwarg-superseded-by-positional-arg,lambda-expressions,len-as-condition,line-too-long,literal-comparison,locally-disabled,logging,logging-format-interpolation,logging-format-truncated,logging-fstring-interpolation,logging-not-lazy,logging-too-few-args,logging-too-many-args,logging-unsupported-format,lost-exception,lru-cache-decorating-method,magic-value-comparison,maybe-no-member,method_args,method-cache-max-size-none,method-check-failed,method-hidden,metrics,miscellaneous,misplaced-bare-raise,misplaced-comparison-constant,misplaced-format-function,misplaced-future,missing-any-param-doc,missing-class-docstring,missing-docstring,missing-final-newline,missing-format-argument-key,missing-format-attribute,missing-format-string-key,missing-function-docstring,missing-kwoa,missing-module-docstring,missing-param-doc,missing-parentheses-for-call-in-test,missing-raises-doc,missing-return-doc,missing-return-type-doc,missing-timeout,missing-type-doc,missing-yield-doc,missing-yield-type-doc,mixed-format-string,mixed-line-endings,modified_iteration,modified-iterating-dict,modified-iterating-list,modified-iterating-set,multiple-constructor-doc,multiple-imports,multiple-statements,named-expr-without-context,nan-comparison,nested_min_max,nested-min-max,newstyle,no-classmethod-decorator,no-else-break,no-else-continue,no-else-raise,no-else-return,no-member,no-method-argument,no-name-in-module,no-self-argument,no-self-use,no-staticmethod-decorator,no-value-for-parameter,non-ascii-file-name,non-ascii-module-import,non-ascii-name,non-iterator-returned,non-parent-init-called,non-str-assignment-to-dunder-name,nonascii-checker,nonexistent-operator,nonlocal-and-global,nonlocal-without-binding,not-a-mapping,not-an-iterable,not-async-context-manager,not-callable,not-context-manager,not-in-loop,notimplemented-raised,overlapping-except,overridden-final-method,parse-error,pointless-exception-statement,pointless-statement,pointless-string-statement,positional-only-arguments-expected,possibly-unused-variable,possibly-used-before-assignment,potential-index-error,prefer-typing-namedtuple,preferred-module,property-with-parameters,protected-access,r,raise-missing-from,raising-bad-type,raising-format-tuple,raising-non-exception,raw-checker-failed,redeclared-assigned-name,redefined-argument-from-local,redefined-builtin,redefined-loop-name,redefined-outer-name,redefined-slots-in-subclass,redefined-variable-type,redundant-keyword-arg,redundant-returns-doc,redundant-typehint-argument,redundant-u-string-prefix,redundant-unittest-assert,redundant-yields-doc,refactoring,reimported,relative-beyond-top-level,repeated-keyword,return-arg-in-generator,return-in-finally,return-in-init,return-outside-function,self-assigning-variable,self-cls-assignment,shadowed-import,shallow-copy-environ,signature-differs,similarities,simplifiable-condition,simplifiable-if-expression,simplifiable-if-statement,simplify-boolean-expression,single-string-used-for-slots,singledispatch-method,singledispatchmethod-function,singleton-comparison,spelling,star-needs-assignment-target,stdlib,stop-iteration-return,string,subclassed-final-class,subprocess-popen-preexec-fn,subprocess-run-check,super-init-not-called,super-with-arguments,super-without-brackets,superfluous-parens,suppressed-message,syntax-error,threading,too-complex,too-few-format-args,too-few-public-methods,too-many-ancestors,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-format-args,too-many-function-args,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-nested-blocks,too-many-positional,too-many-public-methods,too-many-return-statements,too-many-star-expressions,too-many-statements,too-many-try-statements,trailing-comma-tuple,trailing-newlines,trailing-whitespace,truncated-format-string,try-except-raise,typecheck,typevar-double-variance,typevar-name-incorrect-variance,typevar-name-mismatch,unbalanced-dict-unpacking,unbalanced-tuple-unpacking,undefined-all-variable,undefined-loop-variable,undefined-variable,unexpected-keyword-arg,unexpected-line-ending-format,unexpected-special-method-signature,ungrouped-imports,unhashable-dict-key,unhashable-member,unicode_checker,unidiomatic-typecheck,unknown-option-value,unnecessary_ellipsis,unnecessary-comprehension,unnecessary-dict-index-lookup,unnecessary-direct-lambda-call,unnecessary-dunder-call,unnecessary-dunder-call,unnecessary-ellipsis,unnecessary-lambda,unnecessary-lambda-assignment,unnecessary-list-index-lookup,unnecessary-negation,unnecessary-pass,unnecessary-semicolon,unneeded-not,unpacking-non-sequence,unreachable,unrecognized-inline-option,unrecognized-option,unspecified-encoding,unsubscriptable-object,unsupported_version,unsupported-assignment-operation,unsupported-binary-operation,unsupported-delete-operation,unsupported-membership-test,unused-argument,unused-format-string-argument,unused-format-string-key,unused-import,unused-private-member,unused-variable,unused-wildcard-import,use-a-generator,use-dict-literal,use-implicit-booleaness-not-comparison,use-implicit-booleaness-not-comparison-to-string,use-implicit-booleaness-not-comparison-to-zero,use-implicit-booleaness-not-len,use-list-literal,use-maxsplit-arg,use-sequence-for-iteration,use-set-for-membership,use-symbolic-message-instead,use-yield-from,used-before-assignment,used-prior-global-declaration,useless-else-on-loop,useless-import-alias,useless-object-inheritance,useless-option-value,useless-param-doc,useless-parent-delegation,useless-return,useless-super-delegation,useless-suppression,useless-type-doc,useless-with-lock,using-constant-test,using-f-string-in-unsupported-version,using-final-decorator-in-unsupported-version,variables,w,while-used,wildcard-import,wrong-exception-operation,wrong-import-order,wrong-import-position,wrong-spelling-in-comment,wrong-spelling-in-docstring,yield-inside-async-function,yield-outside-function|}",
+            "$TM_SELECTED_TEXT",
+            "# pylint: enable=${1}"
+        ]
+    },
+
+
+    // ===== PYLINT MESSAGE CONTROL =====
+    "Pylint: Disable Next Line": {
+        "description": "Disable Pylint rule on the next line.",
+        "prefix": "pylint",
+        "scope": "python",
+        "body": [
+            "# pylint; reason=${2:REASON}",
+            "# pylint: disable-next=${1|abstract-class-instantiated,abstract-method,access-member-before-definition,all,anomalous-backslash-in-string,anomalous-unicode-escape-in-string,arguments-differ,arguments-out-of-order,arguments-renamed,assert-on-string-literal,assert-on-tuple,assigning-non-slot,assignment-from-no-return,assignment-from-none,astroid-error,async,attribute-defined-outside-init,await-outside-async,bad-builtin,bad-chained-comparison,bad-chained-comparison,bad-classmethod-argument,bad-configuration-section,bad-context-manager,bad-docstring-quotes,bad-dunder-name,bad-except-order,bad-exception-cause,bad-exception-context,bad-file-encoding,bad-format-character,bad-format-string,bad-format-string-key,bad-indentation,bad-inline-option,bad-mcs-classmethod-argument,bad-mcs-method-argument,bad-open-mode,bad-option-value,bad-plugin-value,bad-reversed-sequence,bad-staticmethod-argument,bad-str-strip-call,bad-string-format-type,bad-super-call,bad-thread-instantiation,bare-except,basic,bidirectional-unicode,binary-op-exception,blacklisted-name,boolean-datetime,broad-except,broad-exception-caught,broad-exception-raised,broken-collections-callable,broken-noreturn,c,c-extension-no-member,cache-max-size-none,catching-non-exception,cell-var-from-loop,chained-comparison,class-variable-slots-conflict,classes,compare-to-empty-string,compare-to-zero,comparison-of-constants,comparison-with-callable,comparison-with-itself,condition-evals-to-constant,config-parse-error,confusing-consecutive-elif,confusing-with-statement,consider-alternative-union-syntax,consider-iterating-dictionary,consider-merging-isinstance,consider-refactoring-into-while-condition,consider-swap-variables,consider-ternary-expression,consider-using-alias,consider-using-any-or-all,consider-using-assignment-expr,consider-using-augmented-assign,consider-using-dict-comprehension,consider-using-dict-items,consider-using-enumerate,consider-using-f-string,consider-using-from-import,consider-using-generator,consider-using-get,consider-using-in,consider-using-join,consider-using-max-builtin,consider-using-min-builtin,consider-using-namedtuple-or-dataclass,consider-using-set-comprehension,consider-using-sys-exit,consider-using-ternary,consider-using-tuple,consider-using-with,contextmanager-generator-missing-cleanup,continue-in-finally,cyclic-import,dangerous-default-value,dataclass,declare-non-slot,deprecated-argument,deprecated-attribute,deprecated-class,deprecated-decorator,deprecated-method,deprecated-module,deprecated-pragma,deprecated-typing-alias,design,dict-init-mutate,dict-iter-missing-items,differing-param-doc,differing-type-doc,disallowed-name,docstring-first-line-empty,duplicate-argument-name,duplicate-bases,duplicate-code,duplicate-except,duplicate-key,duplicate-string-formatting-argument,duplicate-value,e,else-if-used,empty-comment,empty-docstring,eq-without-hash,eval-used,exceptions,exec-used,expression-not-assigned,f,f-string-without-interpolation,fatal,file-ignored,fixme,forgotten-debug-statement,format,format-combined-specification,format-needs-mapping,format-string-without-interpolation,function-redefined,global-at-module-level,global-statement,global-variable-not-assigned,global-variable-undefined,implicit-flag-alias,implicit-str-concat,implicit-str-concat-in-sequence,import-error,import-outside-toplevel,import-private-name,import-self,imports,inconsistent-mro,inconsistent-quotes,inconsistent-return-statements,inherit-non-class,init-is-generator,invalid-all-format,invalid-all-object,invalid-bool-returned,invalid-bytes-returned,invalid-character-backspace,invalid-character-carriage-return,invalid-character-esc,invalid-character-nul,invalid-character-sub,invalid-character-zero-width-space,invalid-characters-in-docstring,invalid-class-object,invalid-enum-extension,invalid-envvar-default,invalid-envvar-value,invalid-field-call,invalid-format-index,invalid-format-returned,invalid-getnewargs-ex-returned,invalid-getnewargs-returned,invalid-hash-returned,invalid-index-returned,invalid-length-hint-returned,invalid-length-returned,invalid-metaclass,invalid-name,invalid-overridden-method,invalid-repr-returned,invalid-sequence-index,invalid-slice-index,invalid-slice-step,invalid-slots,invalid-slots-object,invalid-star-assignment-target,invalid-str-returned,invalid-unary-operand-type,invalid-unicode-codec,isinstance-second-argument-not-valid-type,keyword-arg-before-vararg,kwarg-superseded-by-positional-arg,lambda-expressions,len-as-condition,line-too-long,literal-comparison,locally-disabled,logging,logging-format-interpolation,logging-format-truncated,logging-fstring-interpolation,logging-not-lazy,logging-too-few-args,logging-too-many-args,logging-unsupported-format,lost-exception,lru-cache-decorating-method,magic-value-comparison,maybe-no-member,method_args,method-cache-max-size-none,method-check-failed,method-hidden,metrics,miscellaneous,misplaced-bare-raise,misplaced-comparison-constant,misplaced-format-function,misplaced-future,missing-any-param-doc,missing-class-docstring,missing-docstring,missing-final-newline,missing-format-argument-key,missing-format-attribute,missing-format-string-key,missing-function-docstring,missing-kwoa,missing-module-docstring,missing-param-doc,missing-parentheses-for-call-in-test,missing-raises-doc,missing-return-doc,missing-return-type-doc,missing-timeout,missing-type-doc,missing-yield-doc,missing-yield-type-doc,mixed-format-string,mixed-line-endings,modified_iteration,modified-iterating-dict,modified-iterating-list,modified-iterating-set,multiple-constructor-doc,multiple-imports,multiple-statements,named-expr-without-context,nan-comparison,nested_min_max,nested-min-max,newstyle,no-classmethod-decorator,no-else-break,no-else-continue,no-else-raise,no-else-return,no-member,no-method-argument,no-name-in-module,no-self-argument,no-self-use,no-staticmethod-decorator,no-value-for-parameter,non-ascii-file-name,non-ascii-module-import,non-ascii-name,non-iterator-returned,non-parent-init-called,non-str-assignment-to-dunder-name,nonascii-checker,nonexistent-operator,nonlocal-and-global,nonlocal-without-binding,not-a-mapping,not-an-iterable,not-async-context-manager,not-callable,not-context-manager,not-in-loop,notimplemented-raised,overlapping-except,overridden-final-method,parse-error,pointless-exception-statement,pointless-statement,pointless-string-statement,positional-only-arguments-expected,possibly-unused-variable,possibly-used-before-assignment,potential-index-error,prefer-typing-namedtuple,preferred-module,property-with-parameters,protected-access,r,raise-missing-from,raising-bad-type,raising-format-tuple,raising-non-exception,raw-checker-failed,redeclared-assigned-name,redefined-argument-from-local,redefined-builtin,redefined-loop-name,redefined-outer-name,redefined-slots-in-subclass,redefined-variable-type,redundant-keyword-arg,redundant-returns-doc,redundant-typehint-argument,redundant-u-string-prefix,redundant-unittest-assert,redundant-yields-doc,refactoring,reimported,relative-beyond-top-level,repeated-keyword,return-arg-in-generator,return-in-finally,return-in-init,return-outside-function,self-assigning-variable,self-cls-assignment,shadowed-import,shallow-copy-environ,signature-differs,similarities,simplifiable-condition,simplifiable-if-expression,simplifiable-if-statement,simplify-boolean-expression,single-string-used-for-slots,singledispatch-method,singledispatchmethod-function,singleton-comparison,spelling,star-needs-assignment-target,stdlib,stop-iteration-return,string,subclassed-final-class,subprocess-popen-preexec-fn,subprocess-run-check,super-init-not-called,super-with-arguments,super-without-brackets,superfluous-parens,suppressed-message,syntax-error,threading,too-complex,too-few-format-args,too-few-public-methods,too-many-ancestors,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-format-args,too-many-function-args,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-nested-blocks,too-many-positional,too-many-public-methods,too-many-return-statements,too-many-star-expressions,too-many-statements,too-many-try-statements,trailing-comma-tuple,trailing-newlines,trailing-whitespace,truncated-format-string,try-except-raise,typecheck,typevar-double-variance,typevar-name-incorrect-variance,typevar-name-mismatch,unbalanced-dict-unpacking,unbalanced-tuple-unpacking,undefined-all-variable,undefined-loop-variable,undefined-variable,unexpected-keyword-arg,unexpected-line-ending-format,unexpected-special-method-signature,ungrouped-imports,unhashable-dict-key,unhashable-member,unicode_checker,unidiomatic-typecheck,unknown-option-value,unnecessary_ellipsis,unnecessary-comprehension,unnecessary-dict-index-lookup,unnecessary-direct-lambda-call,unnecessary-dunder-call,unnecessary-dunder-call,unnecessary-ellipsis,unnecessary-lambda,unnecessary-lambda-assignment,unnecessary-list-index-lookup,unnecessary-negation,unnecessary-pass,unnecessary-semicolon,unneeded-not,unpacking-non-sequence,unreachable,unrecognized-inline-option,unrecognized-option,unspecified-encoding,unsubscriptable-object,unsupported_version,unsupported-assignment-operation,unsupported-binary-operation,unsupported-delete-operation,unsupported-membership-test,unused-argument,unused-format-string-argument,unused-format-string-key,unused-import,unused-private-member,unused-variable,unused-wildcard-import,use-a-generator,use-dict-literal,use-implicit-booleaness-not-comparison,use-implicit-booleaness-not-comparison-to-string,use-implicit-booleaness-not-comparison-to-zero,use-implicit-booleaness-not-len,use-list-literal,use-maxsplit-arg,use-sequence-for-iteration,use-set-for-membership,use-symbolic-message-instead,use-yield-from,used-before-assignment,used-prior-global-declaration,useless-else-on-loop,useless-import-alias,useless-object-inheritance,useless-option-value,useless-param-doc,useless-parent-delegation,useless-return,useless-super-delegation,useless-suppression,useless-type-doc,useless-with-lock,using-constant-test,using-f-string-in-unsupported-version,using-final-decorator-in-unsupported-version,variables,w,while-used,wildcard-import,wrong-exception-operation,wrong-import-order,wrong-import-position,wrong-spelling-in-comment,wrong-spelling-in-docstring,yield-inside-async-function,yield-outside-function|}"
+        ]
+    },
+
+
+    // ===== PYRIGHT COMMENTS =====
+    "Pyright: Ignore Line": {
+        "description": "Supress type-checker messages the current line.",
+        "prefix": "pyright",
+        "scope": "python",
+        "body": "# type: ignore"
+    },
+
+    "Pyright: File Settings": {
+        "description": "Change diagnostic levels for a single file.",
+        "prefix": "pyright",
+        "scope": "python",
+        "body": "# pyright: ${1|analyzeUnannotatedFunctions,deprecateTypingAliases,disableBytesTypePromotions,enableExperimentalFeatures,enableTypeIgnoreComments,reportAbstractUsage,reportArgumentType,reportAssertAlwaysTrue,reportAssertTypeFailure,reportAssignmentType,reportAttributeAccessIssue,reportCallInDefaultInitializer,reportCallIssue,reportConstantRedefinition,reportDeprecated,reportDuplicateImport,reportFunctionMemberAccess,reportGeneralTypeIssues,reportImplicitOverride,reportImplicitStringConcatenation,reportImportCycles,reportIncompatibleMethodOverride,reportIncompatibleVariableOverride,reportIncompleteStub,reportInconsistentConstructor,reportInconsistentOverload,reportIndexIssue,reportInvalidStringEscapeSequence,reportInvalidStubStatement,reportInvalidTypeArguments,reportInvalidTypeForm,reportInvalidTypeVarUse,reportMatchNotExhaustive,reportMissingImports,reportMissingModuleSource,reportMissingParameterType,reportMissingSuperCall,reportMissingTypeArgument,reportMissingTypeStubs,reportNoOverloadImplementation,reportOperatorIssue,reportOptionalCall,reportOptionalContextManager,reportOptionalIterable,reportOptionalMemberAccess,reportOptionalOperand,reportOptionalSubscript,reportOverlappingOverload,reportPossiblyUnboundVariable,reportPrivateImportUsage,reportPrivateUsage,reportPropertyTypeMismatch,reportRedeclaration,reportReturnType,reportSelfClsParameterName,reportShadowedImports,reportTypeCommentUsage,reportTypedDictNotRequiredAccess,reportUnboundVariable,reportUndefinedVariable,reportUnhashable,reportUninitializedInstanceVariable,reportUnknownArgumentType,reportUnknownLambdaType,reportUnknownMemberType,reportUnknownParameterType,reportUnknownVariableType,reportUnnecessaryCast,reportUnnecessaryComparison,reportUnnecessaryContains,reportUnnecessaryIsInstance,reportUnnecessaryTypeIgnoreComment,reportUnsupportedDunderAll,reportUntypedBaseClass,reportUntypedClassDecorator,reportUntypedFunctionDecorator,reportUntypedNamedTuple,reportUnusedCallResult,reportUnusedClass,reportUnusedCoroutine,reportUnusedExcept,reportUnusedExpression,reportUnusedFunction,reportUnusedImport,reportUnusedVariable,reportWildcardImportFromLibrary,strictDictionaryInference,strictListInference,strictParameterNoneValue,strictSetInference|}=${2|error,warning,none,true,false|}"
+    },
+
+
+    // ===== SQLFLUFF IN-FILE DIRECTIVES =====
+    "SQLFluff: File Directive": {
+        "description": "Alter SQLFluff configuration for one file only.",
+        "prefix": "sqlfluff",
+        "scope": "sql",
+        "body": "-- sqlfluff: ${1|aliasing.table,aliasing.column,aliasing.expression,aliasing.unique.table,aliasing.unused,aliasing.length,aliasing.forbid,aliasing.unique.column,aliasing.self_alias.column,ambiguous.distinct,ambiguous.union,ambiguous.order_by,ambiguous.column_count,ambiguous.join,ambiguous.column_references,ambiguous.set_columns,capitalisation.keywords,capitalisation.identifiers,capitalisation.functions,capitalisation.literals,capitalisation.types,convention.not_equal,convention.coalesce,convention.select_trailing_comma,convention.count_rows,convention.is_null,convention.terminator,convention.statement_brackets,convention.left_join,convention.blocked_words,convention.quoted_literals,convention.casting_style,jinja.padding,layout.spacing,layout.indent,layout.operators,layout.commas,layout.long_lines,layout.functions,layout.cte_bracket,layout.cte_newline,layout.select_targets,layout.select_modifiers,layout.set_operators,layout.end_of_file,layout.start_of_file,references.from,references.qualification,references.consistent,references.keywords,references.special_chars,references.quoting,structure.else_null,structure.simple_case,structure.unused_cte,structure.nested_case,structure.subquery,structure.column_order,structure.using,structure.distinct,structure.join_condition_order,tsql.sp_prefix|}:${2|True,False,<other>|}"
+    },
+
+
+    // ===== SPELL-CHECKER / CSPELL =====
+    "Spell Checker: Disable Block (1)": {
+        "description": "Disable CSpell Spell-Checker until enabled.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": [
+            "$LINE_COMMENT spell-checker:disable",
+            "$TM_SELECTED_TEXT",
+            "$LINE_COMMENT spell-checker:enable"
+        ],
+        "scope": "javascript,javascriptreact,jsonc,python,sql,typescript,typescriptreact,vue"
+    },
+
+    "Spell Checker: Disable Line (1)": {
+        "description": "Disable CSpell Spell-Checker on current line.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": "$LINE_COMMENT spell-checker:disable-line",
+        "scope": "javascript,javascriptreact,jsonc,python,sql,typescript,typescriptreact,vue"
+    },
+
+    "Spell Checker: Disable Next Line (1)": {
+        "description": "Disable CSpell Spell-Checker on next line.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": "$LINE_COMMENT spell-checker:disable-next-line",
+        "scope": "javascript,javascriptreact,jsonc,python,sql,typescript,typescriptreact,vue"
+    },
+
+    "Spell Checker: Add/Ignore Word in File (1)": {
+        "description": "Add a recognized word or ignore a word for this file.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": "$LINE_COMMENT spell-checker:${1|words,ignore|} ${2:word} ${3:another-word}",
+        "scope": "javascript,javascriptreact,jsonc,python,sql,typescript,typescriptreact,vue"
+    },
+
+    "Spell Checker: Disable Block (2)": {
+        "description": "Disable CSpell Spell-Checker until enabled.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": [
+            "$BLOCK_COMMENT_START spell-checker:disable $BLOCK_COMMENT_END",
+            "$TM_SELECTED_TEXT",
+            "$BLOCK_COMMENT_START spell-checker:enable $BLOCK_COMMENT_END"
+        ],
+        "scope": "css,html,markdown,sass,scss,xml"
+    },
+
+    "Spell Checker: Disable Line (2)": {
+        "description": "Disable CSpell Spell-Checker on current line.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": "$BLOCK_COMMENT_START spell-checker:disable-line $BLOCK_COMMENT_END",
+        "scope": "css,html,markdown,sass,scss,xml"
+    },
+
+    "Spell Checker: Disable Next Line (2)": {
+        "description": "Disable CSpell Spell-Checker on next line.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": "$BLOCK_COMMENT_START spell-checker:disable-next-line $BLOCK_COMMENT_END",
+        "scope": "css,html,markdown,sass,scss,xml"
+    },
+
+    "Spell Checker: Add/Ignore Word in File (2)": {
+        "description": "Add a recognized word or ignore a word for this file.",
+        "prefix": ["spell-checker", "cspell"],
+        "body": "$BLOCK_COMMENT_START spell-checker:${1|words,ignore|} ${2:word} ${3:another-word} $BLOCK_COMMENT_END",
+        "scope": "css,html,markdown,sass,scss,xml"
+    },
+
+    // ===== MARKDOWN LINT =====
+    "Markdown Lint: Disable Next Line": {
+        "description": "Disable markdown Lint on next line.",
+        "prefix": ["mklint"],
+        "body": "<!-- markdownlint-disable-next-line ${1|blanks-around-fences,blanks-around-headings,blanks-around-lists,blanks-around-tables,code-block-style,code-fence-style,commands-show-output,descriptive-link-text,emphasis-style,fenced-code-language,first-line-h1,first-line-heading,heading-increment,heading-start-left,heading-style,hr-style,line-length,link-fragments,link-image-reference-definitions,link-image-style,list-indent,list-marker-space,no-alt-text,no-bare-urls,no-blanks-blockquote,no-duplicate-heading,no-emphasis-as-heading,no-empty-links,no-hard-tabs,no-inline-html,no-missing-space-atx,no-missing-space-closed-atx,no-multiple-blanks,no-multiple-space-atx,no-multiple-space-blockquote,no-multiple-space-closed-atx,no-reversed-links,no-space-in-code,no-space-in-emphasis,no-space-in-links,no-trailing-punctuation,no-trailing-spaces,ol-prefix,proper-names,reference-links-images,required-headings,single-h1,single-title,single-trailing-newline,strong-style,table-column-count,table-column-style,table-pipe-style,ul-indent,ul-style|} -->",
+        "scope": "markdown"
+    },
+    "Markdown Lint: Disable Block": {
+        "description": "Disable markdown Lint for current scope.",
+        "prefix": ["mklint"],
+        "body": [
+            "<!-- markdownlint-disable ${1|blanks-around-fences,blanks-around-headings,blanks-around-lists,blanks-around-tables,code-block-style,code-fence-style,commands-show-output,descriptive-link-text,emphasis-style,fenced-code-language,first-line-h1,first-line-heading,heading-increment,heading-start-left,heading-style,hr-style,line-length,link-fragments,link-image-reference-definitions,link-image-style,list-indent,list-marker-space,no-alt-text,no-bare-urls,no-blanks-blockquote,no-duplicate-heading,no-emphasis-as-heading,no-empty-links,no-hard-tabs,no-inline-html,no-missing-space-atx,no-missing-space-closed-atx,no-multiple-blanks,no-multiple-space-atx,no-multiple-space-blockquote,no-multiple-space-closed-atx,no-reversed-links,no-space-in-code,no-space-in-emphasis,no-space-in-links,no-trailing-punctuation,no-trailing-spaces,ol-prefix,proper-names,reference-links-images,required-headings,single-h1,single-title,single-trailing-newline,strong-style,table-column-count,table-column-style,table-pipe-style,ul-indent,ul-style|} -->",
+            "$TM_SELECTED_TEXT",
+            "<!-- markdownlint-enable ${1} -->"
+        ],
+        "scope": "markdown"
+    }
+}

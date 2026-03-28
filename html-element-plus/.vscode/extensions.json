@@ -1,0 +1,71 @@
+// Shared Extensions Recommendation File
+// Adjusted according to each project type
+//
+// Version: DB-2025-07-24
+
+// spell-checker:words autodocstring dbaeumer njpwerner reforme
+
+{
+    "recommendations": [
+        // ===== ALL PROJECTS =====
+        // Code Spell Checker + Canadian English Dictionary
+        "streetsidesoftware.code-spell-checker",
+        "streetsidesoftware.code-spell-checker-canadian-english",
+
+        // French Dictionaries
+        // "streetsidesoftware.code-spell-checker-french",
+        // "streetsidesoftware.code-spell-checker-french-reforme",
+
+        // Markdown linter
+        "DavidAnson.vscode-markdownlint",
+
+        // Markdown Preview Mermaid Support
+        // "bierner.markdown-mermaid",
+
+        // Azure DevOps Pipelines
+        // "ms-azure-devops.azure-pipelines",
+
+        // ===== PYTHON =====
+        // Python language support for intellisense, debugging, unit-testing…
+        // "ms-python.python",
+
+        // Pylint linter for Python
+        // "ms-python.pylint",
+
+        // Docstring generator
+        // "njpwerner.autodocstring",
+
+        // Auto-Formatter
+        // "ms-python.black-formatter",
+
+        // Formating for TOML files
+        // "tamasfe.even-better-toml",
+
+
+        // ===== WEB =====
+        // ESLint linter for JavaScript
+        "dbaeumer.vscode-eslint",
+
+        // JSDoc style docstring generator
+        "crystal-spider.jsdoc-generator",
+
+        // Prettier Formatter
+        "esbenp.prettier-vscode",
+
+        // Lit Plugin
+        "runem.lit-plugin",
+
+
+        // ===== DATABASE =====
+        // PostgreSQL Autocomplete and Connection
+        // "ms-ossdata.vscode-pgsql",
+
+        // SQL Linting and Formatting
+        // "dorzey.vscode-sqlfluff",
+
+
+        // ===== POWERSHELL =====
+        // PowerShell Extension
+        // "ms-vscode.powershell",
+    ]
+}

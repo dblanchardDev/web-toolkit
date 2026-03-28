@@ -1,0 +1,17 @@
+# Configuration file for Prettier, the formatter for HTML,
+# CSS, and JavaScript, setup for GFX projects.
+#
+# Version: DB-2025-03-29
+
+arrowParens: 'always'
+bracketSpacing: false
+experimentalTernaries: true
+printWidth: 120
+singleQuote: true
+tabWidth: 4
+useTabs: false
+
+overrides:
+  - files: ['*.yml', '*.yaml']
+    options:
+      tabWidth: 2

@@ -1,2 +1,23 @@
-# web-toolkit
+<!-- spell-checker:ignore simmon -->
+
+# Web Toolkit
+
 Various tools and wrappers I use regularly to simplify HTML/CSS/JavaScript web development.
+
+## Tools
+
+- [**Remedy CSS**](./remedy-css/README.md): A slightly modified version of [Jen Simmon's CSS Remedy](https://github.com/jensimmons/cssremedy), a simple CSS reset.
+
+## Licenses
+
+Each sub-repository is governed by a separated license. See the _LICENSE_ file in each sub-folder for their corresponding licenses.
+
+## Contributions & Issues
+
+I do not currently accept any contributions nor issues for this project, sorry.
+
+## Support & Warranties
+
+These tools are distributed "AS IS" and are not supported nor certified by anyone. No guarantees are made regarding the functionality and proper functioning of these tool.
+
+Your use of these tools is entirely at your own risk, for which the authors shall not be liable. It shall be your own responsibility to ensure that the tools meet your specific requirements.

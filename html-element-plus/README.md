@@ -17,12 +17,29 @@ class MyComponent extends HTMLElementPlus {
 
 }
 
-customElements.define('my-component', MYComponent);
+customElements.define('my-component', MyComponent);
 ```
 
 ## Features
 
 The following features have been added by HTMLElementPlus, in addition to those already provided by [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) and [web component custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes).
+
+### Query Shadow DOM by Reference
+
+Elements in the shadow DOM can be quickly accessed using a `ref` attribute as follows:
+
+```html
+<span ref="foobar"></span>
+```
+
+```js
+this.refs.foobar.textContent = "Hello World!";
+```
+
+The reference element is returned dynamically and will reflect any changes made in the shadow DOM.
+
+> ⚠️ **Duplicate Ref Values**  
+> If the custom element has multiple ref attributes with the same value, only the first one will be located.
 
 ## JSDoc Type Hints
 

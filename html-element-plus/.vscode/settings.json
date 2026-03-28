@@ -159,7 +159,6 @@
     "eslint.options": {                          // Set config location
         "overrideConfigFile": "eslint.config.js"
     },
-    "eslint.useFlatConfig": true,                // Use the new Flat Config format
     "eslint.validate": ["javascript"],
 
     "evenBetterToml.formatter.trailingNewline": false, // Match other formatters by excluding new line at end of file

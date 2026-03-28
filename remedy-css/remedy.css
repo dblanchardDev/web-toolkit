@@ -1,0 +1,79 @@
+/*
+    CSS Normalization
+
+    Author: Jen Simmons, modified by David Blanchard
+
+    License: Mozilla Public License 2.0
+
+    Source: https://github.com/jensimmons/cssremedy
+*/
+
+*,
+::before,
+::after {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+}
+[hidden] {
+    display: none !important;
+}
+h1 {
+    font-size: 2rem;
+}
+h2 {
+    font-size: 1.5rem;
+}
+h3 {
+    font-size: 1.17rem;
+}
+h4 {
+    font-size: 1rem;
+}
+h5 {
+    font-size: 0.83rem;
+}
+h6 {
+    font-size: 0.67rem;
+}
+h1 {
+    margin: 0.67em 0;
+}
+pre {
+    white-space: pre-wrap;
+}
+hr {
+    border-style: solid;
+    border-width: 1px 0 0;
+    color: inherit;
+    height: 0;
+    overflow: visible;
+}
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+    display: block;
+    max-width: 100%;
+}
+audio:not([controls]) {
+    display: none;
+}
+img,
+svg,
+video,
+canvas {
+    height: auto;
+}
+audio {
+    width: 100%;
+}
+ul,
+div {
+    outline: none;
+} /*Safari Fix*/

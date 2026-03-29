@@ -21,7 +21,6 @@
  * @class HTMLElementPlus
  * @typedef {HTMLElementPlus}
  * @extends {HTMLElement}
- * @interface
  */
 export default class HTMLElementPlus extends HTMLElement {
     constructor() {
@@ -29,6 +28,7 @@ export default class HTMLElementPlus extends HTMLElement {
 
         this.#initRefAccess();
         this.#initReflectedAttributes();
+        this.#initOnAttributeChanges();
     }
 
     // region: TYPE HINTS FOR CUSTOM ELEMENT FUNCTIONS
@@ -61,18 +61,18 @@ export default class HTMLElementPlus extends HTMLElement {
         /*empty*/
     }
 
-    /* eslint-disable no-unused-vars -- REASON */
     /**
      * Invoked when one of the custom element's attributes is added, removed, or changed.
+     *
+     * ⚠️ Implementing this method will break the {@link onAttributeChange} and {@link onAllAttributesSet} methods unless super.attributeChangedCallback() is in the override method.
      *
      * @param {string} name Name of the attribute which changed.
      * @param {string} oldValue Value of the attribute before the change.
      * @param {string} newValue Value of the attribute after the change.
      */
     attributeChangedCallback(name, oldValue, newValue) {
-        /*empty*/
+        this.#handleAttributeChangedCallback(name, oldValue, newValue);
     }
-    /* eslint-enable no-unused-vars */
 
     // endregion
     // region: REFERENCE ELEMENTS
@@ -308,6 +308,93 @@ export default class HTMLElementPlus extends HTMLElement {
             },
         });
         /* eslint-enable accessor-pairs */
+    }
+
+    // endregion
+    // region: ON ATTRIBUTE CHANGE
+
+    /**
+     * List of observed attributes which are defined on the HTML element at load and for which we must wait before calling {@link onAllAttributesSet}.
+     *
+     * @type {string[]}
+     */
+    #awaitedAttributes = [];
+
+    /**
+     * Store each resulting property as it gets loaded in order to invoke {@link onAllAttributesSet}, after which this property gets nulled to indicate all attributes already processed.
+     *
+     * @type {?Object<string, *>[]}
+     */
+    #awaitedProperties = [];
+
+    /** Initialize the logic required for {@link onAllAttributesSet} and {@link onAttributeSet}.
+     * This is in addition to the {@link attributeChangedCallback} which is responsible for calling {@link #handleAttributeChangedCallback}. */
+    #initOnAttributeChanges() {
+        // List out all observed attributes that are set so their value can be awaited
+
+        /** @type string[] */
+        const observed = this.constructor?.observedAttributes || [];
+
+        this.#awaitedAttributes = observed.filter((attrName) => {
+            return !!this.attributes.getNamedItem(attrName);
+        });
+    }
+
+    /**
+     * Handle the attribute change internally, either accumulating the changes to call {@link onAllAttributesSet}, or once all attributes are set, call {@link onAttributeChange} for each change.
+     *
+     * @param {string} name Name of the attribute which changed.
+     * @param {string} oldValue Value of the attribute before the change.
+     * @param {string} newValue Value of the attribute after the change.
+     */
+    #handleAttributeChangedCallback(name, oldValue, newValue) {
+        const oldProcessed = this.#preProcessAttribute(name, oldValue);
+        const newProcessed = this.#preProcessAttribute(name, newValue);
+
+        // Accumulating properties before calling onAllAttributesSet
+        if (this.#awaitedProperties !== null) {
+            // Accumulate property for later
+            this.#awaitedProperties[name] = newProcessed;
+
+            // No longer awaiting this attribute, so remove
+            const awaitingIndex = this.#awaitedAttributes.indexOf(name);
+            if (awaitingIndex > -1) {
+                this.#awaitedAttributes.splice(awaitingIndex, 1);
+            }
+
+            // If last property set, finish call to onAllAttributesSet
+            if (this.#awaitedAttributes.length == 0) {
+                const withDefaults = {...this.constructor.defaultAttributes, ...this.#awaitedProperties};
+                this.onAllAttributesSet(withDefaults);
+                this.#awaitedProperties = null;
+            }
+        }
+        // All already set, this is a change
+        else {
+            this.onAttributeChange(name, oldProcessed, newProcessed);
+        }
+    }
+
+    /**
+     * Invoked once all observed attributes that will have a value or default are set. Called only once at load time. Values will be passed through {@link defaultAttributes} and {@link attributesParser}. Will only be called once after loading, after which {@link onAttributeChange} should be used.
+     *
+     * @param {Object<string, *>[]} attributes - All observed attributes as key-value pairs where the key is the attribute name and the value the attribute's value.
+     */
+    // eslint-disable-next-line no-unused-vars
+    onAllAttributesSet(attributes) {
+        /* empty */
+    }
+
+    /**
+     * Invoke each time an observed attribute changes value. Unlike {@link attributeChangedCallback}, the values are pre-processed by {@link defaultAttributes} and {@link attributesParser}. Additionally, it is not invoked at load time, instead deferring this duty to {@link onAllAttributesSet}.
+     *
+     * @param {string} name - Name of the attribute.
+     * @param {*} oldValue - Attribute's previous value.
+     * @param {*} newValue - Attribute's new value.
+     */
+    // eslint-disable-next-line no-unused-vars
+    onAttributeChange(name, oldValue, newValue) {
+        /* empty */
     }
 
     // endregion

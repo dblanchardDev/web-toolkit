@@ -99,7 +99,9 @@ class MyComponent extends HTMLElementPlus {
         count: '0', // always a string, just like attributes themselves
     };
 
-    static parseAttributes(attrName, value) {
+    static attributesParser(attrName, value) {
+        if (value === null) return value;
+
         switch(attrName) {
             case 'count':
                 return parseInt(value, 10);
@@ -112,7 +114,22 @@ class MyComponent extends HTMLElementPlus {
 
 The values in _defaultAttributes_ should always be strings as attributes are always strings. If a reflected attribute is not set and has no default, `null` will continue to be returned.
 
-The _parseAttributes_ method must always return a value, regardless of whether it gets modified.
+The _attributesParser_ method must always return a value, regardless of whether it gets modified.
+
+> ⚠️ **Avoid Heavy Work**  
+> The _attributesParser_ method should be lightweight as it gets called each time an attribute changes.
+
+### On All Attributes Set & On Attribute Change
+
+Instead of using the _attributeChangedCallback_ method which gets invoked on all observed attribute changes, HTMLElementPlus offers two methods:
+
+- **_onAllAttributesSet_**: Invoked only once after all observed attributes that will be set at load time have been set. This includes observed attributes specified in the HTML element as well as attributes with defaults. Receives a single parameter which contains an object of attribute-name to value pairs.
+- **_onAttributeChange_**: Invoked when an attribute changes value. Unlike _attributeChangedCallback_, this method isn't called at load time (use _onAllAttributesSet_ above instead). Receives the same parameters as _attributeChangedCallback_.
+
+The major advantage of these two alternative methods is that the values they receive as parameters will have been processed by [attribute defaults and parsing](#attribute-defaults--parsing).
+
+> ⚠️ **Using _attributeChangedCallback_**  
+> If you choose to still use _attributeChangedCallback_, remember to call `super.attributeChangedCallback(name, oldValue, newValue)` at the start of your method. Otherwise, the _onAllAttributesSet_ and _onAttributeChange_ methods will no longer be invoked.
 
 ### Query Shadow DOM by Reference
 

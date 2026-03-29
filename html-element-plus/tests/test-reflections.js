@@ -23,8 +23,6 @@ class TestReflections extends HTMLElementPlus {
         this.#testReadOnlyBoolean();
         this.#testUnset();
         this.#testUnreflected();
-
-        let x = this.anotherProp;
     }
 
     #testSettableValue() {

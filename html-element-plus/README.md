@@ -122,3 +122,25 @@ The HTMLElementPlus class is fully typed and documented using JSDoc. To bring th
 ### Custom Element Life Cycle Callbacks
 
 The life cycle callback methods (e.g. connectedCallback, attributeChangedCallback) are defined as empty methods in the HTMLElementPlus class to provide auto-complete capabilities as well as typing for the _attributeChangedCallback_ method.
+
+### Reflected Property Type Hints
+
+To add type hints for [reflected attributed](#Attribute Reflection), define their type in the constructor as shown below. You may also defined them as `@property` in the class's JSDoc, but VS Code does not pickup on those.
+
+```js
+class MyComponent extends HTMLElementPlus {
+    static reflectedAttributes = {
+        info: {},
+    };
+
+    constructor() {
+        super();
+
+        /**
+         * Description goes here
+         * @type {string}
+         */
+        this.info;
+    }
+}
+```

@@ -41,6 +41,16 @@ The reference element is returned dynamically and will reflect any changes made 
 > ⚠️ **Duplicate Ref Values**  
 > If the custom element has multiple ref attributes with the same value, only the first one will be located.
 
+### Custom Event Dispatching Shortcut
+
+A shortcut to dispatch custom events is made available through the `emitEvent` and `emitComposedEvent` methods. Both methods take the same parameters, but the `emitComposedEvent` method will dispatch a composed event which triggers listeners outside of a shadow root.
+
+| Parameter | Type    | Default | Description |
+|-----------|---------|---------|-------------|
+| type      | string  |         | Name of the custom event. |
+| detail    | any     | null    | Event-dependent value associated with the event. Available to the handler using the CustomEvent.detail property. |
+| bubbles   | boolean | true    | Whether the event bubbles up to its ancestors. |
+
 ### Connected Callback Skipped on Move
 
 When the custom element is moved using `Element.moveBefore()`, the _connectedCallback_ method will no longer be invoked, instead invoking the _connectedMoveCallback_ method. This most likely matches the behaviour desired by most web component authors; see [MDN's Lifecycle callbacks and state-preserving moves](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#lifecycle_callbacks_and_state-preserving_moves) for more details.

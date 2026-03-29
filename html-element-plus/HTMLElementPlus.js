@@ -97,4 +97,29 @@ export default class HTMLElementPlus extends HTMLElement {
     }
 
     // endregion
+    // region: EVENTS
+
+    /**
+     * Dispatch a new custom event on this custom element. It will not be composed and is therefore restricted to the shadow root.
+     *
+     * @param {string} type Name of the custom event.
+     * @param {*} [detail=null] Event-dependent value associated with the event. Available to the handler using the CustomEvent.detail property. Defaults to null.
+     * @param {boolean} [bubbles=true] Whether the event bubbles up to its ancestors. Defaults to true.
+     */
+    emitEvent(type, detail = null, bubbles = true) {
+        this.dispatchEvent(new CustomEvent(type, {detail, bubbles, composed: false}));
+    }
+
+    /**
+     * Dispatch a new custom event on this custom element. It be composed will therefore trigger listeners outside of a shadow root.
+     *
+     * @param {string} type Name of the custom event.
+     * @param {*} [detail=null] Event-dependent value associated with the event. Available to the handler using the CustomEvent.detail property. Defaults to null.
+     * @param {boolean} [bubbles=true] Whether the event bubbles up to its ancestors. Defaults to true.
+     */
+    emitComposedEvent(type, detail = null, bubbles = true) {
+        this.dispatchEvent(new CustomEvent(type, {detail, bubbles, composed: true}));
+    }
+
+    // endregion
 }

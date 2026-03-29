@@ -10,8 +10,6 @@
  */
 
 // TODO State Properties
-// TODO Default Attributes
-// TODO Parsed Attributes
 // TODO All Attributes Changed?
 // TODO HTML Rendering/Fetching
 // TODO CSS Rendering/Fetching
@@ -167,7 +165,6 @@ export default class HTMLElementPlus extends HTMLElement {
         /** @type {Object<string, *>} */
         const defaults = this.constructor.defaultAttributes;
 
-        // eslint-disable-next-line no-undefined -- necessary
         if (value === null && attrName in defaults) {
             value = defaults[attrName];
         }
@@ -191,7 +188,7 @@ export default class HTMLElementPlus extends HTMLElement {
     /** Initialize the reflection of HTML attributes to class properties. */
     #initReflectedAttributes() {
         /** @type {Object<string, {boolean?: boolean, readOnly?: boolean}>} */
-        let reflected = this.constructor.reflectedAttributes || {};
+        const reflected = this.constructor.reflectedAttributes || {};
 
         for (let [attrName, config] of Object.entries(reflected)) {
             if (!config) config = {};

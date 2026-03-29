@@ -1,4 +1,4 @@
-// Test that this.ref.myKey returns the HTML Elements in question.
+/** @file Test that this.ref.myKey returns the HTML Elements in question. */
 
 import HTMLElementPlus from '../HTMLElementPlus.js';
 
@@ -7,30 +7,20 @@ class TestReferences extends HTMLElementPlus {
         super();
         this.attachShadow({mode: 'open'});
 
-        // Reference by dot notation
-        let constructDiv = document.createElement('div');
-        constructDiv.setAttribute('ref', 'constructDiv');
-        constructDiv.textContent = '❌ Reference Not Located from Constructor';
-        this.shadowRoot.appendChild(constructDiv);
-        this.refs.constructDiv.textContent = '✅ Reference Located from Constructor';
+        ['Constructor', 'Dot Notation', 'Bracket Notation'].forEach((value) => {
+            let div = document.createElement('div');
+            div.setAttribute('ref', value.replaceAll(' ', ''));
+            div.textContent = `❌ Reference Not Located from ${value}`;
+            this.shadowRoot.appendChild(div);
+        });
 
-        // Reference by dot notation
-        let dotDiv = document.createElement('div');
-        dotDiv.setAttribute('ref', 'dotDiv');
-        dotDiv.textContent = '❌ Reference Not Located from Dot Notation';
-        this.shadowRoot.appendChild(dotDiv);
-
-        // Reference by brackets
-        let bracketDiv = document.createElement('div');
-        bracketDiv.setAttribute('ref', 'bracketDiv');
-        bracketDiv.textContent = '❌ Reference Not Located from Brackets';
-        this.shadowRoot.appendChild(bracketDiv);
+        this.refs.Constructor.textContent = '✅ Reference Located from Constructor';
     }
 
     connectedCallback() {
-        this.refs.dotDiv.textContent = '✅ Reference Located from Dot Notation';
+        this.refs.DotNotation.textContent = '✅ Reference Located from Dot Notation';
         // eslint-disable-next-line dot-notation
-        this.refs['bracketDiv'].textContent = '✅ Reference Located from Brackets';
+        this.refs['BracketNotation'].textContent = '✅ Reference Located from Bracket Notation';
     }
 }
 

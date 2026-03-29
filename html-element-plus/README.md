@@ -144,3 +144,9 @@ class MyComponent extends HTMLElementPlus {
     }
 }
 ```
+
+## Tests
+
+The [tests](./tests) directory contains an HTML page with several web components, each testing a different facet of the HTMLElementPlus class.
+
+To run the tests, serve the entire _html-element-plus_ directory in a web server and browse to the _.../tests_. On GitHub, you can also access the [test results here](https://dblancharddev.github.io/web-toolkit/html-element-plus/tests/).

@@ -24,6 +24,14 @@ export default class HTMLElementPlus extends HTMLElement {
 
     // region: TYPE HINTS FOR CUSTOM ELEMENT FUNCTIONS
 
+    /**
+     * List of attributes that when changed should invoke the attributeChangedCallback method.
+     *
+     * @static
+     * @type {string[]}
+     */
+    static observedAttributes = [];
+
     /** Invoked when the custom element is first connected to the document's DOM. */
     connectedCallback() {
         /*empty*/

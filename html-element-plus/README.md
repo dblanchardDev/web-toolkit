@@ -32,6 +32,7 @@ The following features have been added by HTMLElementPlus, in addition to those 
 
 - **[Attribute Reflection](#attribute-reflection)**: Automatically reflect a element attribute as a class property.
 - **[Attribute Defaults & Parsing](#attribute-defaults--parsing)**: Set defaults for unset attributes and pre-process their values.
+- **[On All Attributes Set & On Attribute Change](#on-all-attributes-set--on-attribute-change)**: Dedicated methods to detect loaded attributes and changes to attributes. These take into account defaults and parsing.
 - **[Query Shadow DOM by Reference](#query-shadow-dom-by-reference)**: Quickly locate elements within your shadow DOM.
 - **[Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)**: Shortcut for dispatching events from the custom element.
 - **[Connected Callback Skipped on Move](#connected-callback-skipped-on-move)**: The _connectedCallback_ method will no longer be called when the custom element is simply moved.

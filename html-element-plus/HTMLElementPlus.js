@@ -10,7 +10,6 @@
  */
 
 // TODO State Properties
-// TODO All Attributes Changed?
 // TODO HTML Rendering/Fetching
 // TODO CSS Rendering/Fetching
 // TODO Await for DOM ready and attributes reflected

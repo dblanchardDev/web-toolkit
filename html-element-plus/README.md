@@ -2,9 +2,13 @@
 
 HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
 
+---
+
 ## Original HTMLElementPlus Project
 
 The [_HTMLElementPlus_ project by Ada Rose Cannon](https://github.com/AdaRoseCannon/html-element-plus) is the original source and inspiration for this tool. It has since been heavily modified by myself (David Blanchard), but retains some of the historical structure.
+
+---
 
 ## Usage
 
@@ -20,9 +24,17 @@ class MyComponent extends HTMLElementPlus {
 customElements.define('my-component', MyComponent);
 ```
 
+---
+
 ## Features
 
 The following features have been added by HTMLElementPlus, in addition to those already provided by [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) and [web component custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes).
+
+- **[Attribute Reflection](#attribute-reflection)**: Automatically reflect a element attribute as a class property.
+- **[Attribute Defaults & Parsing](#attribute-defaults--parsing)**: Set defaults for unset attributes and pre-process their values.
+- **[Query Shadow DOM by Reference](#query-shadow-dom-by-reference)**: Quickly locate elements within your shadow DOM.
+- **[Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)**: Shortcut for dispatching events from the custom element.
+- **[Connected Callback Skipped on Move](#connected-callback-skipped-on-move)**: The _connectedCallback_ method will no longer be called when the custom element is simply moved.
 
 ### Attribute Reflection
 
@@ -70,6 +82,38 @@ When a non-boolean attribute isn't set, the property will return `null`.
 > 🐍 **Snake-Case Names**  
 > Attributes that use snake-case names which will get an equivalent property name using camel-case. For example, the attribute name `my-data` will become `this.myData` when reflected.
 
+### Attribute Defaults & Parsing
+
+[Reflected attributes](#attribute-reflection) can be pre-processed by:
+
+- setting defaults which will be returned if the attribute is not set,
+- parsing the string value before it is returned, which is useful to consistently apply the same processing every time it is accessed (e.g. to cast the string attribute to another type).
+
+```js
+class MyComponent extends HTMLElementPlus {
+    static reflectedAttributes = {
+        count: {},
+    };
+
+    static defaultAttributes = {
+        count: '0', // always a string, just like attributes themselves
+    };
+
+    static parseAttributes(attrName, value) {
+        switch(attrName) {
+            case 'count':
+                return parseInt(value, 10);
+            default:
+                return value;
+        }
+    }
+}
+```
+
+The values in _defaultAttributes_ should always be strings as attributes are always strings. If a reflected attribute is not set and has no default, `null` will continue to be returned.
+
+The _parseAttributes_ method must always return a value, regardless of whether it gets modified.
+
 ### Query Shadow DOM by Reference
 
 Elements in the shadow DOM can be quickly accessed using a `ref` attribute as follows:
@@ -102,6 +146,8 @@ A shortcut to dispatch custom events is made available through the `emitEvent` a
 When the custom element is moved using `Element.moveBefore()`, the _connectedCallback_ method will no longer be invoked, instead invoking the _connectedMoveCallback_ method. This most likely matches the behaviour desired by most web component authors; see [MDN's Lifecycle callbacks and state-preserving moves](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#lifecycle_callbacks_and_state-preserving_moves) for more details.
 
 To return to the original behaviour, simply delete the empty _connectedMoveCallback_ method from the HTMLElementPlus class which was implemented as part of the JSDoc type hints for [custom element life cycle callbacks](#custom-element-life-cycle-callbacks).
+
+---
 
 ## JSDoc Type Hints
 
@@ -144,6 +190,8 @@ class MyComponent extends HTMLElementPlus {
     }
 }
 ```
+
+---
 
 ## Tests
 

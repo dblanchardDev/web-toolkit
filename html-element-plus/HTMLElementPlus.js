@@ -9,12 +9,21 @@
  *     without the express permission of David Blanchard.
  */
 
+// TODO State Properties
+// TODO Default Attributes
+// TODO Parsed Attributes
+// TODO All Attributes Changed?
+// TODO HTML Rendering/Fetching
+// TODO CSS Rendering/Fetching
+// TODO Await for DOM ready and attributes reflected
+
 /**
  * HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
  *
  * @class HTMLElementPlus
  * @typedef {HTMLElementPlus}
  * @extends {HTMLElement}
+ * @interface
  */
 export default class HTMLElementPlus extends HTMLElement {
     constructor() {
@@ -124,10 +133,55 @@ export default class HTMLElementPlus extends HTMLElement {
     }
 
     // endregion
+    // region: DEFAULT & PARSED ATTRIBUTES
+
+    /**
+     * Default values for {@link reflectedAttributes}. Used when the attribute is not defined in the HTML nor set through the property. Each entry is a key-value pair where the key is the attribute name and the value the default value to be used.
+     *
+     * @static
+     * @type {Object<string, string>}
+     */
+    static defaultAttributes = {};
+
+    /**
+     * Pre-process {@link reflectedAttributes} before they are returned. This is particularly useful for type casting values as all attributes are stored as strings. This runs after retrieving default values from {@link defaultAttributes}.
+     *
+     * @static
+     * @overload
+     * @param {string} attrName Name of the attribute.
+     * @param {string} value Value as read from the attribute.
+     * @returns {*} The parsed or processed value to be returned by the reflected property.
+     */
+    static attributesParser(attrName, value) {
+        return value;
+    }
+
+    /**
+     * Pre-process an attribute value, applying the defaults and invoking the parser.
+     *
+     * @param {string} attrName Name of the attribute.
+     * @param {string} value Attribute's value that is to be processed, as read from the attribute.
+     * @returns {*} The value after processing.
+     */
+    #preProcessAttribute(attrName, value) {
+        /** @type {Object<string, *>} */
+        const defaults = this.constructor.defaultAttributes;
+
+        // eslint-disable-next-line no-undefined -- necessary
+        if (value === null && attrName in defaults) {
+            value = defaults[attrName];
+        }
+
+        value = this.constructor.attributesParser(attrName, value);
+
+        return value;
+    }
+
+    // endregion
     // region: REFLECTED ATTRIBUTES
 
     /**
-     * List of HTML element attributes that should be made available as properties of this custom element. The property will be reflected both ways unless it is set to read-only at which point it cannot be modified at the custom element property level. Attributes marked as boolean only have their presence reflected, whereas all other values are reflected as their string value.
+     * Listing of HTML element attributes that should be made available as properties of this custom element. The property will be reflected both ways unless it is set to read-only at which point it cannot be modified at the custom element property level. Attributes marked as boolean only have their presence reflected, whereas all other values are reflected as their string value.
      *
      * @static
      * @type {Object<string, {boolean?: boolean, readOnly?: boolean}>}
@@ -221,7 +275,7 @@ export default class HTMLElementPlus extends HTMLElement {
         Object.defineProperty(this, propName, {
             get() {
                 const value = this.getAttribute(attrName);
-                return value; // TODO: add support for parsing and defaults
+                return this.#preProcessAttribute(attrName, value);
             },
             configurable: true,
         });

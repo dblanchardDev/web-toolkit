@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
  *
@@ -20,6 +21,7 @@ export default class HTMLElementPlus extends HTMLElement {
         super();
 
         this.#initRefAccess();
+        this.#initReflectedAttributes();
     }
 
     // region: TYPE HINTS FOR CUSTOM ELEMENT FUNCTIONS
@@ -119,6 +121,142 @@ export default class HTMLElementPlus extends HTMLElement {
      */
     emitComposedEvent(type, detail = null, bubbles = true) {
         this.dispatchEvent(new CustomEvent(type, {detail, bubbles, composed: true}));
+    }
+
+    // endregion
+    // region: REFLECTED ATTRIBUTES
+
+    /**
+     * List of HTML element attributes that should be made available as properties of this custom element. The property will be reflected both ways unless it is set to read-only at which point it cannot be modified at the custom element property level. Attributes marked as boolean only have their presence reflected, whereas all other values are reflected as their string value.
+     *
+     * @static
+     * @type {Object<string, {boolean?: boolean, readOnly?: boolean}>}
+     */
+    static reflectedAttributes = {};
+
+    /** Initialize the reflection of HTML attributes to class properties. */
+    #initReflectedAttributes() {
+        /** @type {Object<string, {boolean?: boolean, readOnly?: boolean}>} */
+        let reflected = this.constructor.reflectedAttributes || {};
+
+        for (let [attrName, config] of Object.entries(reflected)) {
+            if (!config) config = {};
+            const readOnly = config?.readOnly || false;
+
+            if (config?.boolean) {
+                this.#addBooleanReflection(attrName, readOnly);
+            } else {
+                this.#addValueReflection(attrName, readOnly);
+            }
+        }
+    }
+
+    /**
+     * Convert a snake-case attribute name to a camel case property name.
+     *
+     * @param {string} name The snake-case name.
+     * @returns {string} The camel-case name.
+     */
+    #snakeToCamel(name) {
+        if (name.includes('-')) {
+            name = name
+                .split('-')
+                .map((value, index) => {
+                    if (index > 0) return value.slice(0, 1).toUpperCase() + value.slice(1);
+                    else return value;
+                })
+                .join('');
+        }
+        return name;
+    }
+
+    /**
+     * Add a boolean property to the component which reflects an HTML attribute. Boolean properties work based on the presence or absence of the attribute only.
+     *
+     * @param {string} attrName Name of the source attribute.
+     * @param {boolean} readOnly Whether the property is read-only. Will decide whether a setter is added.
+     * @returns {string} Name of the resulting property.
+     */
+    #addBooleanReflection(attrName, readOnly) {
+        const propName = this.#snakeToCamel(attrName);
+
+        // Create getter
+        Object.defineProperty(this, propName, {
+            get() {
+                return this.hasAttribute(attrName);
+            },
+            configurable: true,
+        });
+
+        // Create setter
+        if (readOnly) {
+            this.#addReadOnlySetter(propName);
+        } else {
+            /* eslint-disable accessor-pairs -- get defined elsewhere */
+            Object.defineProperty(this, propName, {
+                set(value) {
+                    if (value) this.setAttribute(attrName, '');
+                    else this.removeAttribute(attrName);
+                },
+            });
+            /* eslint-enable accessor-pairs */
+        }
+
+        Object.defineProperty(this, propName, {configurable: false});
+
+        return propName;
+    }
+
+    /**
+     * Add a value property to the component which reflects an HTML attribute. Value properties return the actual value stored in the attribute.
+     *
+     * @param {string} attrName Name of the source attribute.
+     * @param {boolean} readOnly Whether the property is read-only. Will decide whether a setter is added.
+     * @returns {string} Name of the resulting property.
+     */
+    #addValueReflection(attrName, readOnly) {
+        const propName = this.#snakeToCamel(attrName);
+
+        // Create getter
+        Object.defineProperty(this, propName, {
+            get() {
+                const value = this.getAttribute(attrName);
+                return value; // TODO: add support for parsing and defaults
+            },
+            configurable: true,
+        });
+
+        // Create setter
+        if (readOnly) {
+            this.#addReadOnlySetter(propName);
+        } else {
+            /* eslint-disable accessor-pairs -- get set elsewhere */
+            Object.defineProperty(this, propName, {
+                set(value) {
+                    this.setAttribute(attrName, value);
+                },
+            });
+            /* eslint-enable accessor-pairs */
+        }
+
+        Object.defineProperty(this, propName, {configurable: false});
+
+        return propName;
+    }
+
+    /**
+     * Add a read-only setter to a reflected property, throwing an error if setter is called.
+     *
+     * @param {string} propName Name of the resulting property.
+     */
+    #addReadOnlySetter(propName) {
+        /* eslint-disable accessor-pairs -- getter set elsewhere */
+        Object.defineProperty(this, propName, {
+            set() {
+                throw new TypeError(`${propName} is read-only`);
+            },
+        });
+        /* eslint-enable accessor-pairs */
     }
 
     // endregion

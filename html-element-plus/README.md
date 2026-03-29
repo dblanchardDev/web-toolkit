@@ -24,6 +24,52 @@ customElements.define('my-component', MyComponent);
 
 The following features have been added by HTMLElementPlus, in addition to those already provided by [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) and [web component custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes).
 
+### Attribute Reflection
+
+Attributes can automatically be reflected as properties, allowing getting and setting an HTML element's attributes through a property in the custom element class.
+
+```html
+<my-component info='hello'></my-component>
+```
+
+```js
+class MyComponent extends HTMLElementPlus {
+    static reflectedAttributes = {
+        info: {},
+    };
+
+    method() {
+        this.info += 'world!';
+        // Will result in the HTML attribute being set to 'hello world!'
+    }
+}
+```
+
+#### Reflect Attributes Object
+
+Attributes that are to be reflected must be defined in the _reflectedAttributes_ static property. Each entry in this object consists of key-value pair where the key is the attribute name as would be set in the HTML tag of the custom element, and the value is a configuration object. The configuration object can contain the following entries:
+
+| Config Key | Type    | Default | Description |
+|------------|---------|---------|-------------|
+| boolean    | boolean | `false` | A boolean reflected attribute will only detect the presence of the attribute (or lack thereof), with the property returning a boolean. |
+| readOnly   | boolean | `false` | Whether the attribute should be settable through its reflected property. |
+
+```js
+class MyComponent extends HTMLElementPlus {
+    static reflectedAttributes = {
+        info: {
+            boolean: true,
+            readOnly: true,
+        },
+    };
+}
+```
+
+When a non-boolean attribute isn't set, the property will return `null`.
+
+> 🐍 **Snake-Case Names**  
+> Attributes that use snake-case names which will get an equivalent property name using camel-case. For example, the attribute name `my-data` will become `this.myData` when reflected.
+
 ### Query Shadow DOM by Reference
 
 Elements in the shadow DOM can be quickly accessed using a `ref` attribute as follows:

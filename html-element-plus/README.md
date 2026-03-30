@@ -2,11 +2,27 @@
 
 HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
 
+- [Original HTMLElementPlus Project](#original-htmlelementplus-project)
+- [Usage](#usage)
+- [Features](#features)
+  - [Query Shadow DOM by Reference](#query-shadow-dom-by-reference)
+  - [Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)
+  - [Attribute Configuration](#attribute-configuration)
+  - [On All Attributes Set & On Attribute Change](#on-all-attributes-set--on-attribute-change)
+  - [Reflected Internals States](#reflected-internals-states)
+  - [Connected Callback Skipped on Move](#connected-callback-skipped-on-move)
+- [JSDoc Type Hints](#jsdoc-type-hints)
+- [Tests](#tests)
+
 ---
 
 ## Original HTMLElementPlus Project
 
-The [_HTMLElementPlus_ project by Ada Rose Cannon](https://github.com/AdaRoseCannon/html-element-plus) is the original source and inspiration for this tool. It has since been heavily modified by myself (David Blanchard), but retains some of the historical structure.
+The [_HTMLElementPlus_ project by Ada Rose Cannon](https://github.com/AdaRoseCannon/html-element-plus) is the original source and inspiration for this tool.
+
+Feature that originated from the original code include: [Query Shadow DOM by Reference](#query-shadow-dom-by-reference), [Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut) and [On All Attributes Set & On Attribute Change](#on-all-attributes-set--on-attribute-change); all of which have since been heavily modified.
+
+All other features are original to this version.
 
 ---
 
@@ -34,7 +50,7 @@ The following features have been added by HTMLElementPlus, in addition to those 
 - **[Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)**: Shortcut for dispatching events from the custom element.
 - **[Attribute Configuration](#attribute-configuration)**: Add type casting, reflection, and defaults to attributes.
 - **[On All Attributes Set & On Attribute Change](#on-all-attributes-set--on-attribute-change)**: Dedicated methods to detect loaded attributes and changes to attributes. These methods respect the [attribute configuration](#attribute-configuration) including defaults and type.
-- **[Reflected Internals State](#reflectedInternalsState)**: Reflection of element internals state to properties for in CSS with :state() pseudo-class.
+- **[Reflected Internals States](#reflected-internals-states)**: Reflection of element internals state to properties for in CSS with :state() pseudo-class.
 - **[Connected Callback Skipped on Move](#connected-callback-skipped-on-move)**: The _connectedCallback_ method will no longer be called when the custom element is simply moved.
 
 ### Query Shadow DOM by Reference
@@ -141,7 +157,7 @@ The major advantage of these two alternative methods is that the values they rec
 > ⚠️ **Using _attributeChangedCallback_**  
 > If you choose to still use _attributeChangedCallback_, remember to call `super.attributeChangedCallback(name, oldValue, newValue)` at the start of your method. Otherwise, the _onAllAttributesSet_ and _onAttributeChange_ methods will no longer be invoked.
 
-### Reflected Internal States
+### Reflected Internals States
 
 The use if [element internals states](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors) has been simplified through reflection of states, similar to how [attribute reflection works](#reflected-property).
 

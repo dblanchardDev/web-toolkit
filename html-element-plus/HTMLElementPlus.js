@@ -9,7 +9,6 @@
  *     without the express permission of David Blanchard.
  */
 
-// TODO State Properties
 // TODO HTML Rendering/Fetching
 // TODO CSS Rendering/Fetching
 // TODO Await for DOM ready and attributes reflected
@@ -180,20 +179,22 @@ export default class HTMLElementPlus extends HTMLElement {
      * Listing of HTML element attributes that should be made available as properties of this custom element. The property will be reflected both ways unless it is set to read-only at which point it cannot be modified at the custom element property level. Attributes marked as boolean only have their presence reflected, whereas all other values are reflected as their string value.
      *
      * @static
-     * @type {Object<string, {boolean?: boolean, readOnly?: boolean}>}
+     * @type {Object<string, {boolean?: boolean, readOnly?: boolean, state?: boolean}>}
      */
     static reflectedAttributes = {};
 
     /** Initialize the reflection of HTML attributes to class properties. */
     #initReflectedAttributes() {
-        /** @type {Object<string, {boolean?: boolean, readOnly?: boolean}>} */
+        /** @type {Object<string, {boolean?: boolean, readOnly?: boolean, state?: boolean}>} */
         const reflected = this.constructor.reflectedAttributes || {};
 
         for (let [attrName, config] of Object.entries(reflected)) {
             if (!config) config = {};
             const readOnly = config?.readOnly || false;
 
-            if (config?.boolean) {
+            if (config?.state) {
+                this.#addStateReflection(attrName);
+            } else if (config?.boolean) {
                 this.#addBooleanReflection(attrName, readOnly);
             } else {
                 this.#addValueReflection(attrName, readOnly);
@@ -307,6 +308,38 @@ export default class HTMLElementPlus extends HTMLElement {
             },
         });
         /* eslint-enable accessor-pairs */
+    }
+
+    /**
+     * Internal element to store CSS internal states.
+     *
+     * @type {ElementInternals}
+     */
+    #internals = null;
+
+    /**
+     * Add a state property to the component which reflects an internal element state. See https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors for more details.
+     *
+     * @param {string} attrName Name of the state attribute.
+     * @returns {string} Name of the resulting property.
+     */
+    #addStateReflection(attrName) {
+        const propName = this.#snakeToCamel(attrName);
+
+        if (!this.#internals) this.#internals = this.attachInternals();
+
+        // Create getter
+        Object.defineProperty(this, propName, {
+            get() {
+                return this.#internals.states.has(attrName);
+            },
+            set(value) {
+                if (value) this.#internals.states.add(attrName);
+                else this.#internals.states.delete(attrName);
+            },
+        });
+
+        return propName;
     }
 
     // endregion

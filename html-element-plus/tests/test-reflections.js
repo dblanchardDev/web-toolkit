@@ -10,6 +10,7 @@ class TestReflections extends TestHTMLElementPlus {
         present: {boolean: true},
         unchanged: {boolean: true, readOnly: true},
         unset: {},
+        internals: {state: true},
     };
 
     constructor() {
@@ -23,6 +24,7 @@ class TestReflections extends TestHTMLElementPlus {
         this.#testReadOnlyBoolean();
         this.#testUnset();
         this.#testUnreflected();
+        this.#testInternals();
     }
 
     #testSettableValue() {
@@ -118,6 +120,38 @@ class TestReflections extends TestHTMLElementPlus {
         // eslint-disable-next-line no-undefined -- no alternative
         if (this?.unreflected !== undefined) this.fail(label, 'Reflected When it Should Not');
         else this.pass(label);
+    }
+
+    #testInternals() {
+        const style = document.createElement('style');
+        style.textContent = `
+            #testInternals {
+                &:before {
+                    content: "❌ ";
+                }
+                &:after {
+                    content: " Failed - CSS State Not Applied";
+                }
+            }
+
+            :host(:state(internals)) {
+                #testInternals {
+                    &:before {
+                        content: "✅ ";
+                    }
+                    &:after {
+                        content: " Successful";
+                    }
+                }
+            }
+        `;
+        this.shadowRoot.appendChild(style);
+
+        const div = document.createElement('div');
+        div.setAttribute('id', 'testInternals');
+        div.textContent = 'Element Internals State';
+        this.shadowRoot.appendChild(div);
+        this.internals = true;
     }
 }
 

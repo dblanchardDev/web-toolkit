@@ -66,6 +66,7 @@ Attributes that are to be reflected must be defined in the _reflectedAttributes_
 |------------|---------|---------|-------------|
 | boolean    | boolean | `false` | A boolean reflected attribute will only detect the presence of the attribute (or lack thereof), with the property returning a boolean. |
 | readOnly   | boolean | `false` | Whether the attribute should be settable through its reflected property. |
+| state      | boolean | `false` | Whether to set an [element internals state](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors) instead of an HTML element attribute. The _boolean_ and _readOnly_ values will be ignored if set along with `state: true`. |
 
 ```js
 class MyComponent extends HTMLElementPlus {
@@ -78,7 +79,7 @@ class MyComponent extends HTMLElementPlus {
 }
 ```
 
-When a non-boolean attribute isn't set, the property will return `null`.
+The properties of reflect boolean or state attributes always return a boolean, whereas reflected value attributes return the value or null if not set.
 
 > 🐍 **Snake-Case Names**  
 > Attributes that use snake-case names which will get an equivalent property name using camel-case. For example, the attribute name `my-data` will become `this.myData` when reflected.

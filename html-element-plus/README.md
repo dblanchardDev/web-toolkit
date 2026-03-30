@@ -30,108 +30,12 @@ customElements.define('my-component', MyComponent);
 
 The following features have been added by HTMLElementPlus, in addition to those already provided by [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) and [web component custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes).
 
-- **[Attribute Reflection](#attribute-reflection)**: Automatically reflect a element attribute as a class property.
-- **[Attribute Defaults & Parsing](#attribute-defaults--parsing)**: Set defaults for unset attributes and pre-process their values.
-- **[On All Attributes Set & On Attribute Change](#on-all-attributes-set--on-attribute-change)**: Dedicated methods to detect loaded attributes and changes to attributes. These take into account defaults and parsing.
 - **[Query Shadow DOM by Reference](#query-shadow-dom-by-reference)**: Quickly locate elements within your shadow DOM.
 - **[Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)**: Shortcut for dispatching events from the custom element.
+- **[Attribute Configuration](#attribute-configuration)**: Add type casting, reflection, and defaults to attributes.
+- **[On All Attributes Set & On Attribute Change](#on-all-attributes-set--on-attribute-change)**: Dedicated methods to detect loaded attributes and changes to attributes. These methods respect the [attribute configuration](#attribute-configuration) including defaults and type.
+- **[Reflected Internals State](#reflectedInternalsState)**: Reflection of element internals state to properties for in CSS with :state() pseudo-class.
 - **[Connected Callback Skipped on Move](#connected-callback-skipped-on-move)**: The _connectedCallback_ method will no longer be called when the custom element is simply moved.
-
-### Attribute Reflection
-
-Attributes can automatically be reflected as properties, allowing getting and setting an HTML element's attributes through a property in the custom element class.
-
-```html
-<my-component info='hello'></my-component>
-```
-
-```js
-class MyComponent extends HTMLElementPlus {
-    static reflectedAttributes = {
-        info: {},
-    };
-
-    method() {
-        this.info += 'world!';
-        // Will result in the HTML attribute being set to 'hello world!'
-    }
-}
-```
-
-#### Reflect Attributes Object
-
-Attributes that are to be reflected must be defined in the _reflectedAttributes_ static property. Each entry in this object consists of key-value pair where the key is the attribute name as would be set in the HTML tag of the custom element, and the value is a configuration object. The configuration object can contain the following entries:
-
-| Config Key | Type    | Default | Description |
-|------------|---------|---------|-------------|
-| boolean    | boolean | `false` | A boolean reflected attribute will only detect the presence of the attribute (or lack thereof), with the property returning a boolean. |
-| readOnly   | boolean | `false` | Whether the attribute should be settable through its reflected property. |
-| state      | boolean | `false` | Whether to set an [element internals state](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors) instead of an HTML element attribute. The _boolean_ and _readOnly_ values will be ignored if set along with `state: true`. |
-
-```js
-class MyComponent extends HTMLElementPlus {
-    static reflectedAttributes = {
-        info: {
-            boolean: true,
-            readOnly: true,
-        },
-    };
-}
-```
-
-The properties of reflect boolean or state attributes always return a boolean, whereas reflected value attributes return the value or null if not set.
-
-> 🐍 **Snake-Case Names**  
-> Attributes that use snake-case names which will get an equivalent property name using camel-case. For example, the attribute name `my-data` will become `this.myData` when reflected.
-
-### Attribute Defaults & Parsing
-
-[Reflected attributes](#attribute-reflection) can be pre-processed by:
-
-- setting defaults which will be returned if the attribute is not set,
-- parsing the string value before it is returned, which is useful to consistently apply the same processing every time it is accessed (e.g. to cast the string attribute to another type).
-
-```js
-class MyComponent extends HTMLElementPlus {
-    static reflectedAttributes = {
-        count: {},
-    };
-
-    static defaultAttributes = {
-        count: '0', // always a string, just like attributes themselves
-    };
-
-    static attributesParser(attrName, value) {
-        if (value === null) return value;
-
-        switch(attrName) {
-            case 'count':
-                return parseInt(value, 10);
-            default:
-                return value;
-        }
-    }
-}
-```
-
-The values in _defaultAttributes_ should always be strings as attributes are always strings. If a reflected attribute is not set and has no default, `null` will continue to be returned.
-
-The _attributesParser_ method must always return a value, regardless of whether it gets modified.
-
-> ⚠️ **Avoid Heavy Work**  
-> The _attributesParser_ method should be lightweight as it gets called each time an attribute changes.
-
-### On All Attributes Set & On Attribute Change
-
-Instead of using the _attributeChangedCallback_ method which gets invoked on all observed attribute changes, HTMLElementPlus offers two methods:
-
-- **_onAllAttributesSet_**: Invoked only once after all observed attributes that will be set at load time have been set. This includes observed attributes specified in the HTML element as well as attributes with defaults. Receives a single parameter which contains an object of attribute-name to value pairs.
-- **_onAttributeChange_**: Invoked when an attribute changes value. Unlike _attributeChangedCallback_, this method isn't called at load time (use _onAllAttributesSet_ above instead). Receives the same parameters as _attributeChangedCallback_.
-
-The major advantage of these two alternative methods is that the values they receive as parameters will have been processed by [attribute defaults and parsing](#attribute-defaults--parsing).
-
-> ⚠️ **Using _attributeChangedCallback_**  
-> If you choose to still use _attributeChangedCallback_, remember to call `super.attributeChangedCallback(name, oldValue, newValue)` at the start of your method. Otherwise, the _onAllAttributesSet_ and _onAttributeChange_ methods will no longer be invoked.
 
 ### Query Shadow DOM by Reference
 
@@ -159,6 +63,100 @@ A shortcut to dispatch custom events is made available through the `emitEvent` a
 | type      | string  |         | Name of the custom event. |
 | detail    | any     | null    | Event-dependent value associated with the event. Available to the handler using the CustomEvent.detail property. |
 | bubbles   | boolean | true    | Whether the event bubbles up to its ancestors. |
+
+### Attribute Configuration
+
+Additional behaviour can be automatically added to [HTML element attributes](https://developer.mozilla.org/en-US/docs/Glossary/Attribute), including setting defaults and automatically [reflecting the attribute as a property](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Reflected_attributes).
+
+This behaviour is set in the _attributeConfigs_ static property as an object, with the key of each entry being the name of the attribute (using snake-case) and the value of each entry being an object with the configuration. The following options are available in the configuration:
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| type | string | `'string'` | Defines the casting and behaviour of the attribute. See [Attribute Types](#attribute-types) below for details. |
+| reflected | boolean | `false` | Indicates whether a [reflected property](#reflected-property) is created for this attribute. If set to `false`, defaults and typing will only be applied to [observed attributes](#observed-attributes). |
+| readOnly | boolean | `false` | Whether the reflected property is read-only or is editable. Has no effect if _reflected_ is `false`. |
+| default | string \| number \| boolean | `null` | When an attribute is not set in the HTML, the reflected attribute and observed attributes will see the default value instead of `null`. If setting a reflected attribute to null, the default will be used. |
+
+```js
+class MyComponent extends HTMLElementPlus {
+    static attributeConfigs = {
+        filtered: {
+            type: 'boolean',
+            reflected: true,
+        },
+    };
+}
+```
+
+#### Attribute Types
+
+The _type_ value in the attribute configuration can be one of the following:
+
+- **`'string'`**: The default. Attribute value will be kept as a string.
+- **`'number'`**: The attribute (which is always a string) will be cast to a number before being reflected or observed. If the value is not a number, will return `NaN`. With reflections, the casting is applied in both the setter and the getter.
+- **`'boolean'`**: The attribute behaves based on presence only, with a `true` value indicating the attribute is present. The string value set in the attribute is ignored.
+
+The properties of reflected boolean attributes always return a boolean. Other properties of other reflected attributes return the value itself (after casting to a number if applicable) or when not set return the default or null.
+
+#### Reflected Property
+
+When _reflected_ is set to true, the attributes become available as a property within the class and can be read and changed using this property. See [Reflected attributes on MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Reflected_attributes) for more details.
+
+The default value, read-only setting, and type casting to number will be applied to the properties. <!-- FIXME: Add details once bugs fixed -->
+
+> 🐍 **Snake-Case Names**  
+> Attributes that use snake-case names which will get an equivalent property name using camel-case. For example, the attribute name `my-data` will become `this.myData` when reflected.
+
+```js
+class MyComponent extends HTMLElementPlus {
+    static attributeConfigs = {
+        count: {
+            type: 'number',
+            reflected: true,
+        },
+    };
+
+    myMethod() {
+        this.count += 10;
+    }
+}
+```
+
+#### Observed Attributes
+
+Observed attributes set in the [_observedAttributes_ array](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes) can also be manipulated by the attribute configuration, with defaults and type casting to number being applied before observed changes invoke the [On All Attributes Set](#on-all-attributes-set--on-attribute-change) and [On Attribute Change](#on-all-attributes-set--on-attribute-change) methods.
+
+> 🚫 **Attribute Changed Callback Method**  
+> The _attributeChangedCallback_ method is native to web components and its behaviour cannot be modified. Defaults and type casting do not apply to values passed to this method.
+
+### On All Attributes Set & On Attribute Change
+
+Instead of using the _attributeChangedCallback_ method which gets invoked on all observed attribute changes, HTMLElementPlus offers two methods:
+
+- **_onAllAttributesSet_**: Invoked only once after all observed attributes that will be set at load time have been set. This includes observed attributes specified in the HTML element as well as attributes with defaults. Receives a single parameter which contains an object of attribute-name to value pairs.
+- **_onAttributeChange_**: Invoked when an attribute changes value. Unlike _attributeChangedCallback_, this method isn't called at load time (use _onAllAttributesSet_ above instead). Receives the same parameters as _attributeChangedCallback_.
+
+The major advantage of these two alternative methods is that the values they receive as parameters will respected the [attribute configuration](#attribute-configuration) where set; meaning the default will be used for unset attributes and values will be pre-cast to numbers where applicable. <!-- FIXME: Adjust once behaviour bugs fixed -->
+
+> ⚠️ **Using _attributeChangedCallback_**  
+> If you choose to still use _attributeChangedCallback_, remember to call `super.attributeChangedCallback(name, oldValue, newValue)` at the start of your method. Otherwise, the _onAllAttributesSet_ and _onAttributeChange_ methods will no longer be invoked.
+
+### Reflected Internal States
+
+The use if [element internals states](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors) has been simplified through reflection of states, similar to how [attribute reflection works](#reflected-property).
+
+Reflected states must be specified in the _internalStates_ static object, with each entry's key being the name of the state and the value being the initial state of the state. When the initial state is set to `true`, it will be automatically activated during the constructor.
+
+```js
+class MyComponent extends HTMLElementPlus {
+    static internalStates = {
+        hidden: true,
+    };
+
+    becomeVisible() {
+        this.visible = false;
+    }
+```
 
 ### Connected Callback Skipped on Move
 

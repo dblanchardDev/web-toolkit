@@ -78,7 +78,7 @@ export default class HTMLElementPlus extends HTMLElement {
     /**
      * Access shadow root HTML elements using their `ref` attribute value.
      *
-     * @type {Object<string, (HTMLElement | null)}
+     * @type {Object<string, (HTMLElement | null)>}
      */
     refs = null;
 
@@ -165,7 +165,7 @@ export default class HTMLElementPlus extends HTMLElement {
         let processed;
 
         /** @type {AttributeConfig} */ // @ts-ignore
-        const config = (/** @type {typeof HTMLElementPlus} */ this.constructor).attributeConfigs[attrName] ?? {};
+        const config = this.constructor.attributeConfigs[attrName] ?? {};
 
         // Apply the default if need
         if (value === null && 'default' in config) {
@@ -367,7 +367,8 @@ export default class HTMLElementPlus extends HTMLElement {
             }
 
             // If last property set, finish call to onAllAttributesSet
-            if (this.#awaitedAttributes.length == 0) { //@ts-ignore
+            if (this.#awaitedAttributes.length == 0) {
+                //@ts-ignore
                 const withDefaults = {...this.constructor.defaultAttributes, ...this.#awaitedProperties};
                 this.onAllAttributesSet(withDefaults);
                 this.#awaitedProperties = null;

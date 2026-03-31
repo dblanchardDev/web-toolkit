@@ -104,6 +104,8 @@ class MyComponent extends HTMLElementPlus {
 }
 ```
 
+The _attributesConfigs_ property is also made available as a readOnly class property.
+
 #### Attribute Types
 
 The _type_ value in the attribute configuration can be one of the following:
@@ -145,6 +147,8 @@ Observed attributes set in the [_observedAttributes_ array](https://developer.mo
 > 🚫 **Attribute Changed Callback Method**  
 > The _attributeChangedCallback_ method is native to web components and its behaviour cannot be modified. Defaults and type casting do not apply to values passed to this method.
 
+The _observedAttributes_ property is also made available as a readOnly class property.
+
 ### On All Attributes Set & On Attribute Change
 
 Instead of using the _attributeChangedCallback_ method which gets invoked on all observed attribute changes, HTMLElementPlus offers two methods:
@@ -173,6 +177,8 @@ class MyComponent extends HTMLElementPlus {
         this.visible = false;
     }
 ```
+
+The _internalStates_ property is also made available as a readOnly class property.
 
 ### Connected Callback Skipped on Move
 

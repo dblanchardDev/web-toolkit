@@ -153,6 +153,22 @@ export default class HTMLElementPlus extends HTMLElement {
     static attributeConfigs = {};
 
     /**
+     * Listing of element attributes whose behaviour is to be modified or enhanced. Key is the attributes name and value is a configuration object:
+     *
+     * type: 'string' – keep the attribute value as a string (default); 'number' – auto-cast strings to numbers, returning NaN when needed; 'boolean' – return a boolean depending on whether the attribute is present.
+     * reflected: Boolean indicating whether the element's attributed is reflected as a property in the class. Defaults to false.
+     * readOnly: Boolean setting the reflected property to read-only (cannot be modified). Only applied to reflected attributes. Defaults to false.
+     * default: Value (string, number, or boolean) to which the property is set if the attribute is not set. The default for attributes is made available in reflections, in {@link onAllAttributesSet} and {@link onAttributeChange} when the attribute itself isn't set.
+     *
+     * @readonly
+     * @type {Object<string, AttributeConfig>}
+     */
+    get attributeConfigs() {
+        // @ts-ignore
+        return this.constructor?.attributeConfigs ?? {};
+    }
+
+    /**
      * Pre-process an attribute value, applying the defaults and casting the type.
      *
      * @param {string} attrName Name of the attribute.
@@ -160,8 +176,7 @@ export default class HTMLElementPlus extends HTMLElement {
      * @returns {*} The value after processing.
      */
     #preProcessAttribute(attrName, value) {
-        /** @type {AttributeConfig} */ // @ts-ignore
-        const config = this.constructor.attributeConfigs[attrName] ?? {};
+        const config = this.attributeConfigs[attrName] ?? {};
 
         // Apply the default if need
         if (value === null && 'default' in config) {
@@ -183,10 +198,7 @@ export default class HTMLElementPlus extends HTMLElement {
 
     /** Initialize the reflection of HTML attributes to class properties. */
     #initReflections() {
-        /** @type {Object<string, AttributeConfig>} */ //@ts-ignore
-        const attrConfigs = this.constructor.attributeConfigs || {};
-
-        for (let [attrName, config] of Object.entries(attrConfigs)) {
+        for (let [attrName, config] of Object.entries(this.attributeConfigs)) {
             if (config?.reflected) {
                 const readOnly = !!config?.readOnly;
                 if (config?.type === 'boolean') {
@@ -317,6 +329,17 @@ export default class HTMLElementPlus extends HTMLElement {
     // region: ON ATTRIBUTE CHANGE
 
     /**
+     * List of element attributes which will trigger callbacks on load and change.
+     *
+     * @readonly
+     * @type {string[]}
+     */
+    get observedAttribute() {
+        // @ts-ignore
+        return this.constructor?.observedAttributes || [];
+    }
+
+    /**
      * List of observed attributes which are defined on the HTML element at load and for which we must wait before calling {@link onAllAttributesSet}.
      *
      * @type {string[]}
@@ -334,11 +357,7 @@ export default class HTMLElementPlus extends HTMLElement {
      * This is in addition to the {@link attributeChangedCallback} which is responsible for calling {@link #handleAttributeChangedCallback}. */
     #initOnAttributeChanges() {
         // List out all observed attributes that are set so their value can be awaited
-
-        /** @type string[] */ //@ts-ignore
-        const observed = this.constructor?.observedAttributes || [];
-
-        this.#awaitedAttributes = observed.filter((attrName) => {
+        this.#awaitedAttributes = this.observedAttribute.filter((attrName) => {
             return !!this.attributes.getNamedItem(attrName);
         });
     }
@@ -419,14 +438,22 @@ export default class HTMLElementPlus extends HTMLElement {
      */
     static internalStates = {};
 
+    /**
+     * Configuration for the element internals states (used in CSS via :state() pseudo-class) that get reflected as properties in the class. Keys are the state name, values are a boolean indicating the initial state with `true` being present. See https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors for more details.
+     *
+     * @readonly
+     * @type {Object<string, boolean>}
+     */
+    get internalStates() {
+        // @ts-ignore
+        return this.constructor.internalStates() || {};
+    }
+
     /** Initialize the element internals states, creating the reflected properties and setting initial status. */
     #initInternalStates() {
         this.#internals = this.attachInternals();
 
-        /** @type {Object<string, boolean>} */ //@ts-ignore
-        const stateConfigs = this.constructor.internalStates || {};
-
-        for (let [stateName, initiallyPresent] of Object.entries(stateConfigs)) {
+        for (let [stateName, initiallyPresent] of Object.entries(this.internalStates)) {
             const propName = this.#addStateReflection(stateName);
             this[propName] = initiallyPresent;
         }

@@ -118,7 +118,7 @@ The properties of reflected boolean attributes always return a boolean. Other pr
 
 When _reflected_ is set to true, the attributes become available as a property within the class and can be read and changed using this property. See [Reflected attributes on MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Reflected_attributes) for more details.
 
-The default value, read-only setting, and type casting to number will be applied to the properties. <!-- FIXME: Add details once bugs fixed -->
+The default value, read-only setting, and type casting to number will be applied to the properties. If a reflected property is set to null, the attribute is removed.
 
 > 🐍 **Snake-Case Names**  
 > Attributes that use snake-case names which will get an equivalent property name using camel-case. For example, the attribute name `my-data` will become `this.myData` when reflected.

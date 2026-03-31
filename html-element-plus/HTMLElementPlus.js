@@ -133,7 +133,6 @@ export default class HTMLElementPlus extends HTMLElement {
     // region: ATTRIBUTE CONFIGURATION
 
     // BUG: when an attribute is of type boolean, the observation doesn't work in the same way instead casting the value to a boolean
-    // BUG: ensure that on setting reflected to null, the attribute is removed
     // FIXME: Consider freezing configurations once used
 
     /**
@@ -309,7 +308,8 @@ export default class HTMLElementPlus extends HTMLElement {
             Object.defineProperty(this, propName, {
                 set(value) {
                     const castValue = this.#preProcessAttribute(attrName, value);
-                    this.setAttribute(attrName, castValue);
+                    if (castValue === null) this.removeAttribute(attrName);
+                    else this.setAttribute(attrName, castValue);
                 },
             });
             /* eslint-enable accessor-pairs */

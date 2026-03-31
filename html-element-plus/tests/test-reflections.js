@@ -13,6 +13,10 @@ class TestReflections extends TestHTMLElementPlus {
         count: {reflected: true, type: 'number'},
         nan: {reflected: true, type: 'number'},
         unreflected: {},
+        'unset-default': {reflected: true, default: 'UNSET DEFAULT'},
+        'set-default': {reflected: true, default: 'DEFAULT'},
+        'count-default': {reflected: true, default: '123'},
+        nothing: {reflected: true},
     };
 
     constructor() {
@@ -28,6 +32,10 @@ class TestReflections extends TestHTMLElementPlus {
         this.#testUnreflected();
         this.#testNumberCasting();
         this.#testNotANumber();
+        this.#testUnsetDefault();
+        this.#testSetDefault();
+        this.#testNumberDefault();
+        this.#testNothing();
     }
 
     #testSettableValue() {
@@ -135,6 +143,31 @@ class TestReflections extends TestHTMLElementPlus {
         const label = 'Not A Number Casting';
         if (Number.isNaN(this?.nan)) this.pass(label);
         else this.fail(label, 'Unexpected Value');
+    }
+
+    #testUnsetDefault() {
+        const label = 'Unset Default';
+        if (this.unsetDefault !== 'UNSET DEFAULT') this.fail(label, 'Default Not Returned');
+        else this.pass(label);
+    }
+
+    #testSetDefault() {
+        const label = 'Set Default';
+        if (this.setDefault === 'DEFAULT') this.fail(label, 'Default Used Even When Attribute Set');
+        else if (this.setDefault !== 'SET') this.fail(label, 'Wrong Value Returned');
+        else this.pass(label);
+    }
+
+    #testNumberDefault() {
+        const label = 'Number Casting of Default';
+        if (this.countDefault !== 123) this.fail(label, 'Unexpected Value');
+        else this.pass(label);
+    }
+
+    #testNothing() {
+        const label = 'No Default Not Set';
+        if (this.nothing !== null) this.fail(label, 'Not Null');
+        else this.pass(label);
     }
 }
 

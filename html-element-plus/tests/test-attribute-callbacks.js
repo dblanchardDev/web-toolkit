@@ -9,18 +9,11 @@ const compareDicts = (a, b) => {
 
 class TestAttributeCallbacks extends TestHTMLElementPlus {
     static observedAttributes = ['no-default', 'default', 'processed', 'unset'];
-    static defaultAttributes = {default: 'DEFAULT'};
 
-    static attributesParser(attrName, value) {
-        if (value === null) return value;
-
-        switch (attrName) {
-            case 'processed':
-                return parseInt(value, 10);
-            default:
-                return value;
-        }
-    }
+    static attributeConfigs = {
+        default: {default: 'DEFAULT'},
+        processed: {type: 'number'},
+    };
 
     constructor() {
         super();

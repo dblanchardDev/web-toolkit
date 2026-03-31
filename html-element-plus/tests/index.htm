@@ -16,7 +16,6 @@
         <script src="test-references.js" type="module"></script>
         <script src="test-events.js" type="module"></script>
         <script src="test-reflections.js" type="module"></script>
-        <script src="test-defaults-parse.js" type="module"></script>
         <script src="test-attribute-callbacks.js" type="module"></script>
 
         <style>
@@ -41,7 +40,7 @@
         <test-events></test-events>
 
         <h2>Attribute Reflections</h2>
-        <small>Expect 9 tests results</small>
+        <small>Expect 13 tests results</small>
         <test-reflections
             alpha="A"
             bravo="B"
@@ -51,11 +50,8 @@
             unreflected="NO"
             count="22"
             nan="not a number"
+            set-default="SET"
         ></test-reflections>
-
-        <h2>Attribute Defaults & Pre-Parsing</h2>
-        <small>Expect 5 tests results</small>
-        <test-defaults-parse set="SET" count="0"></test-defaults-parse>
 
         <h2>Attribute Callbacks</h2>
         <small>Expect 2 tests results</small>

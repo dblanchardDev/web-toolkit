@@ -1,4 +1,3 @@
-// @ts-check
 /**
  * @file HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
  *
@@ -19,7 +18,7 @@
  * @class HTMLElementPlus
  * @typedef {HTMLElementPlus}
  * @extends {HTMLElement}
- */
+ */ //@ts-ignore
 export default class HTMLElementPlus extends HTMLElement {
     constructor() {
         super();
@@ -161,27 +160,28 @@ export default class HTMLElementPlus extends HTMLElement {
      *
      * @param {string} attrName Name of the attribute.
      * @param {string} value Attribute's value that is to be processed, as read from the attribute.
-     * @param {applyDefault} [applyDefault=true] Whether to apply the default value if value is null. Defaults to true.
      * @returns {*} The value after processing.
      */
     #preProcessAttribute(attrName, value) {
-        /** @type {AttributeConfig} */
-        const config = this.constructor.attributeConfigs[attrName] ?? {};
+        let processed;
+
+        /** @type {AttributeConfig} */ // @ts-ignore
+        const config = (/** @type {typeof HTMLElementPlus} */ this.constructor).attributeConfigs[attrName] ?? {};
 
         // Apply the default if need
         if (value === null && 'default' in config) {
-            value = config.default;
+            processed = config.default;
         }
 
         // Cast the value if number or boolean
         const type = config?.type ?? 'string';
         if (type == 'number') {
-            value = parseFloat(value);
+            processed = parseFloat(value);
         } else if (type == 'boolean') {
-            value = !!value;
+            processed = !!value;
         }
 
-        return value;
+        return processed ?? value;
     }
 
     // endregion
@@ -189,7 +189,7 @@ export default class HTMLElementPlus extends HTMLElement {
 
     /** Initialize the reflection of HTML attributes to class properties. */
     #initReflections() {
-        /** @type {Object<string, AttributeConfig>} */
+        /** @type {Object<string, AttributeConfig>} */ //@ts-ignore
         const attrConfigs = this.constructor.attributeConfigs || {};
 
         for (let [attrName, config] of Object.entries(attrConfigs)) {
@@ -337,7 +337,7 @@ export default class HTMLElementPlus extends HTMLElement {
     #initOnAttributeChanges() {
         // List out all observed attributes that are set so their value can be awaited
 
-        /** @type string[] */
+        /** @type string[] */ //@ts-ignore
         const observed = this.constructor?.observedAttributes || [];
 
         this.#awaitedAttributes = observed.filter((attrName) => {
@@ -368,7 +368,7 @@ export default class HTMLElementPlus extends HTMLElement {
             }
 
             // If last property set, finish call to onAllAttributesSet
-            if (this.#awaitedAttributes.length == 0) {
+            if (this.#awaitedAttributes.length == 0) { //@ts-ignore
                 const withDefaults = {...this.constructor.defaultAttributes, ...this.#awaitedProperties};
                 this.onAllAttributesSet(withDefaults);
                 this.#awaitedProperties = null;
@@ -424,7 +424,7 @@ export default class HTMLElementPlus extends HTMLElement {
     #initInternalStates() {
         this.#internals = this.attachInternals();
 
-        /** @type {Object<string, boolean>} */
+        /** @type {Object<string, boolean>} */ //@ts-ignore
         const stateConfigs = this.constructor.internalStates || {};
 
         for (let [stateName, initiallyPresent] of Object.entries(stateConfigs)) {

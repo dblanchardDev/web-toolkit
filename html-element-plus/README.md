@@ -91,7 +91,7 @@ This behaviour is set in the _attributeConfigs_ static property as an object, wi
 | type | string | `'string'` | Defines the casting and behaviour of the attribute. See [Attribute Types](#attribute-types) below for details. |
 | reflected | boolean | `false` | Indicates whether a [reflected property](#reflected-property) is created for this attribute. If set to `false`, defaults and typing will only be applied to [observed attributes](#observed-attributes). |
 | readOnly | boolean | `false` | Whether the reflected property is read-only or is editable. Has no effect if _reflected_ is `false`. |
-| default | string \| number \| boolean | `null` | When an attribute is not set in the HTML, the reflected attribute and observed attributes will see the default value instead of `null`. If setting a reflected attribute to null, the default will be used. |
+| default | string \| number \| boolean | `null` | Will automatically set the attribute to this value at startup if it not already set in the HTML. This is regardless of whether its observed, reflected, or neither. Use the type which corresponds to the configured type. |
 
 ```js
 class MyComponent extends HTMLElementPlus {

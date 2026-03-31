@@ -14,6 +14,7 @@ class TestReflections extends TestHTMLElementPlus {
         nan: {reflected: true, type: 'number'},
         unreflected: {},
         'unset-default': {reflected: true, default: 'UNSET DEFAULT'},
+        'unset-number-default': {reflected: true, default: 9999, type: 'number'},
         'unset-boolean-default': {reflected: true, default: true, type: 'boolean'},
         'set-default': {reflected: true, default: 'DEFAULT'},
         'count-default': {reflected: true, default: '123'},
@@ -35,6 +36,7 @@ class TestReflections extends TestHTMLElementPlus {
         this.#testNumberCasting();
         this.#testNotANumber();
         this.#testUnsetDefault();
+        this.#testUnsetNumberDefault();
         this.#testUnsetBooleanDefault();
         this.#testSetDefault();
         this.#testNumberDefault();
@@ -155,6 +157,17 @@ class TestReflections extends TestHTMLElementPlus {
             this.fail(label, 'Default Attribute Not Set in HTML');
         } else if (this.unsetDefault !== 'UNSET DEFAULT') {
             this.fail(label, 'Default Not Returned');
+        } else {
+            this.pass(label);
+        }
+    }
+
+    #testUnsetNumberDefault() {
+        const label = 'Unset Number Default';
+        if (this.getAttribute('unset-number-default') !== '9999') {
+            this.fail(label, 'Default Attribute Not Set in HTML');
+        } else if (this.unsetNumberDefault !== 9999) {
+            this.fail(label, 'Default Not Returned or Not Parsed');
         } else {
             this.pass(label);
         }

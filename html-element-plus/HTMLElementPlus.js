@@ -24,6 +24,7 @@ export default class HTMLElementPlus extends HTMLElement {
         super();
 
         this.#initRefAccess();
+        this.#initAttributeConfigsDefaults();
         this.#initReflections();
         this.#initOnAttributeChanges();
         this.#initInternalStates();
@@ -132,7 +133,6 @@ export default class HTMLElementPlus extends HTMLElement {
     // region: ATTRIBUTE CONFIGURATION
 
     // BUG: when an attribute is of type boolean, the observation doesn't work in the same way instead casting the value to a boolean
-    // BUG: default for a boolean attributes doesn't work as a default of true doesn't result in the attribute being present. Same really for value attributes.
     // BUG: ensure that on setting reflected to null, the attribute is removed
     // FIXME: Consider freezing configurations once used
 
@@ -153,6 +153,28 @@ export default class HTMLElementPlus extends HTMLElement {
      * @type {Object<string, AttributeConfig>}
      */
     static attributeConfigs = {};
+
+    /** Set defaults for attributes at startup. */
+    #initAttributeConfigsDefaults() {
+        // @ts-ignore
+        const attrConfigs = this.constructor.attributeConfigs || {};
+
+        for (let [attrName, config] of Object.entries(attrConfigs)) {
+            if (this.hasAttribute(attrName) === false && 'default' in config) {
+                switch (config?.type) {
+                    case 'boolean':
+                        if (config?.default) this.setAttribute(attrName, '');
+                        break;
+                    case 'number':
+                        // @ts-ignore
+                        this.setAttribute(attrName, String(parseInt(config?.default, 10)));
+                        break;
+                    default:
+                        this.setAttribute(attrName, String(config?.default));
+                }
+            }
+        }
+    }
 
     /**
      * Pre-process an attribute value, applying the defaults and casting the type.
@@ -177,6 +199,7 @@ export default class HTMLElementPlus extends HTMLElement {
         if (type == 'number') {
             processed = parseFloat(value);
         } else if (type == 'boolean') {
+            // BUG: Should this be here?
             processed = !!value;
         }
 

@@ -14,9 +14,11 @@ class TestReflections extends TestHTMLElementPlus {
         nan: {reflected: true, type: 'number'},
         unreflected: {},
         'unset-default': {reflected: true, default: 'UNSET DEFAULT'},
+        'unset-boolean-default': {reflected: true, default: true, type: 'boolean'},
         'set-default': {reflected: true, default: 'DEFAULT'},
         'count-default': {reflected: true, default: '123'},
         nothing: {reflected: true},
+        'set-null': {reflected: true},
     };
 
     constructor() {
@@ -33,9 +35,11 @@ class TestReflections extends TestHTMLElementPlus {
         this.#testNumberCasting();
         this.#testNotANumber();
         this.#testUnsetDefault();
+        this.#testUnsetBooleanDefault();
         this.#testSetDefault();
         this.#testNumberDefault();
         this.#testNothing();
+        this.#setAttributeToNull();
     }
 
     #testSettableValue() {
@@ -147,8 +151,24 @@ class TestReflections extends TestHTMLElementPlus {
 
     #testUnsetDefault() {
         const label = 'Unset Default';
-        if (this.unsetDefault !== 'UNSET DEFAULT') this.fail(label, 'Default Not Returned');
-        else this.pass(label);
+        if (this.getAttribute('unset-default') !== 'UNSET DEFAULT') {
+            this.fail(label, 'Default Attribute Not Set in HTML');
+        } else if (this.unsetDefault !== 'UNSET DEFAULT') {
+            this.fail(label, 'Default Not Returned');
+        } else {
+            this.pass(label);
+        }
+    }
+
+    #testUnsetBooleanDefault() {
+        const label = 'Unset Boolean Default';
+        if (this.hasAttribute('unset-boolean-default') === false) {
+            this.fail(label, 'Attribute Not Present');
+        } else if (this.unsetBooleanDefault === false) {
+            this.fail(label, 'Property Returning False');
+        } else {
+            this.pass(label);
+        }
     }
 
     #testSetDefault() {
@@ -168,6 +188,13 @@ class TestReflections extends TestHTMLElementPlus {
         const label = 'No Default Not Set';
         if (this.nothing !== null) this.fail(label, 'Not Null');
         else this.pass(label);
+    }
+
+    #setAttributeToNull() {
+        const label = 'Null Removes Attribute';
+        this.setNull = null;
+        if (this.getAttribute('set-null') === null) this.pass(label);
+        else this.fail(label, 'Attribute Not Removed When Nulled');
     }
 }
 

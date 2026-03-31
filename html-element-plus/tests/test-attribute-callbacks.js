@@ -8,24 +8,34 @@ const compareDicts = (a, b) => {
 };
 
 class TestAttributeCallbacks extends TestHTMLElementPlus {
-    static observedAttributes = ['no-default', 'default', 'processed', 'unset'];
+    static observedAttributes = ['no-default', 'default', 'number', 'boolean', 'unset'];
 
     static attributeConfigs = {
         default: {default: 'DEFAULT'},
-        processed: {type: 'number'},
+        number: {type: 'number'},
+        boolean: {type: 'boolean'},
     };
+
+    allLabel = 'On All Attributes Set';
+    stringLabel = 'On String Attribute Change';
+    numberLabel = 'On Number Attribute Change';
+    booleanLabel = 'On Boolean Attribute Change';
 
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
 
-        this.allDiv = this.fail('On All Attributes Set', 'Not Run');
-        this.oneDiv = this.fail('On Attribute Change', 'Not Run');
+        this.allDiv = this.fail(this.allLabel, 'Did Not Run');
+        this.stringDiv = this.fail(this.stringLabel, 'Did Not Run');
+        this.numberDiv = this.fail(this.numberLabel, 'Did Not Run');
+        this.booleanDiv = this.fail(this.booleanLabel, 'Did Not Run');
     }
 
     connectedCallback() {
         setTimeout(() => {
-            this.setAttribute('processed', '20');
+            this.setAttribute('default', 'NEW');
+            this.setAttribute('number', '20');
+            this.setAttribute('boolean', '');
         }, 100);
     }
 
@@ -37,30 +47,49 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
     onAllAttributesSet(attributes) {
         this.allDiv.remove();
 
-        const label = 'On All Attributes Set';
         const expected = {
             'no-default': 'NO-DEFAULT',
             default: 'DEFAULT',
-            processed: 0,
+            number: 0,
+            presence: false,
         };
 
         if (compareDicts(expected, attributes)) {
-            this.pass(label);
+            this.pass(this.allLabel);
         } else {
-            this.fail(label, 'Attributes returned are not as expected');
-            console.error(label, 'Expected:', expected, 'Received:', attributes);
+            this.fail(this.allLabel, 'Attributes returned are not as expected');
+            console.error(this.allLabel, 'Expected:', expected, 'Received:', attributes);
         }
     }
 
     onAttributeChange(name, oldValue, newValue) {
-        this.oneDiv.remove();
+        let label;
 
-        const label = 'On Attribute Change';
-
-        if (name !== 'processed') this.fail(label, 'Unexpected Name');
-        else if (oldValue !== 0) this.fail(label, 'Unexpected Old Value');
-        else if (newValue !== 20) this.fail(label, 'Unexpected New Value');
-        else this.pass(label);
+        switch (name) {
+            case 'default':
+                label = this.stringLabel;
+                this.stringDiv.remove();
+                if (oldValue != 'DEFAULT') this.fail(label, 'Unexpected Old Value');
+                else if (newValue !== 'NEW') this.fail(label, 'Unexpected New Value');
+                else this.pass(label);
+                break;
+            case 'number':
+                label = this.numberLabel;
+                this.numberDiv.remove();
+                if (oldValue !== 0) this.fail(label, 'Unexpected Old Value');
+                else if (newValue !== 20) this.fail(label, 'Unexpected New Value');
+                else this.pass(label);
+                break;
+            case 'boolean':
+                label = this.booleanLabel;
+                this.booleanDiv.remove();
+                if (oldValue !== false) this.fail(label, 'Unexpected Old Value');
+                else if (newValue !== true) this.fail(label, 'Unexpected New Value');
+                else this.pass(label);
+                break;
+            default:
+                this.fail('Single Attribute Change', 'Unexpected Name');
+        }
     }
 }
 

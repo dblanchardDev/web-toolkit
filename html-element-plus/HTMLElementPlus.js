@@ -133,8 +133,8 @@ export default class HTMLElementPlus extends HTMLElement {
 
     // BUG: when an attribute is of type boolean, the observation doesn't work in the same way instead casting the value to a boolean
     // BUG: default for a boolean attributes doesn't work as a default of true doesn't result in the attribute being present. Same really for value attributes.
-    // FIXME: ensure that on setting reflected to null, the default is used and whether that's desired
-    // FIXME: Consider freezing configurations once used.
+    // BUG: ensure that on setting reflected to null, the attribute is removed
+    // FIXME: Consider freezing configurations once used
 
     /**
      * Object used to define the configuration of attributes in {@link attributeConfigs}.

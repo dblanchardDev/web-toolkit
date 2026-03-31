@@ -17,7 +17,7 @@ class TestReflections extends TestHTMLElementPlus {
         'unset-number-default': {reflected: true, default: 9999, type: 'number'},
         'unset-boolean-default': {reflected: true, default: true, type: 'boolean'},
         'set-default': {reflected: true, default: 'DEFAULT'},
-        'count-default': {reflected: true, default: '123'},
+        'count-default': {reflected: true, default: '123', type: 'number'},
         nothing: {reflected: true},
         'set-null': {reflected: true},
     };
@@ -153,8 +153,8 @@ class TestReflections extends TestHTMLElementPlus {
 
     #testUnsetDefault() {
         const label = 'Unset Default';
-        if (this.getAttribute('unset-default') !== 'UNSET DEFAULT') {
-            this.fail(label, 'Default Attribute Not Set in HTML');
+        if (this.getAttribute('unset-default') !== null) {
+            this.fail(label, 'Unset Default Attribute Was Set in HTML');
         } else if (this.unsetDefault !== 'UNSET DEFAULT') {
             this.fail(label, 'Default Not Returned');
         } else {
@@ -164,10 +164,12 @@ class TestReflections extends TestHTMLElementPlus {
 
     #testUnsetNumberDefault() {
         const label = 'Unset Number Default';
-        if (this.getAttribute('unset-number-default') !== '9999') {
-            this.fail(label, 'Default Attribute Not Set in HTML');
+        if (this.getAttribute('unset-number-default') !== null) {
+            this.fail(label, 'Unset Default Attribute Was Set in HTML');
+        } else if (this.unsetNumberDefault === '9999') {
+            this.fail(label, 'Default Number Not Parsed');
         } else if (this.unsetNumberDefault !== 9999) {
-            this.fail(label, 'Default Not Returned or Not Parsed');
+            this.fail(label, 'Default Not Returned or Unexpected Value');
         } else {
             this.pass(label);
         }
@@ -175,10 +177,10 @@ class TestReflections extends TestHTMLElementPlus {
 
     #testUnsetBooleanDefault() {
         const label = 'Unset Boolean Default';
-        if (this.hasAttribute('unset-boolean-default') === false) {
-            this.fail(label, 'Attribute Not Present');
-        } else if (this.unsetBooleanDefault === false) {
-            this.fail(label, 'Property Returning False');
+        if (this.hasAttribute('unset-boolean-default') !== false) {
+            this.fail(label, 'Attribute Was Present');
+        } else if (this.unsetBooleanDefault !== false) {
+            this.fail(label, 'Unexpected Value');
         } else {
             this.pass(label);
         }

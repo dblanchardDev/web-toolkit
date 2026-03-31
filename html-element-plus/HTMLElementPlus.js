@@ -24,7 +24,6 @@ export default class HTMLElementPlus extends HTMLElement {
         super();
 
         this.#initRefAccess();
-        this.#initAttributeConfigsDefaults();
         this.#initReflections();
         this.#initOnAttributeChanges();
         this.#initInternalStates();
@@ -137,7 +136,7 @@ export default class HTMLElementPlus extends HTMLElement {
 
     /**
      * Object used to define the configuration of attributes in {@link attributeConfigs}.
-     * @typedef {{type?: ('string'|'number'|'boolean'), reflected?: boolean, readOnly?: boolean, default?: (string|number|boolean)}} AttributeConfig
+     * @typedef {{type?: ('string'|'number'|'boolean'), reflected?: boolean, readOnly?: boolean, default?: (string|number)}} AttributeConfig
      */
 
     /**
@@ -153,56 +152,30 @@ export default class HTMLElementPlus extends HTMLElement {
      */
     static attributeConfigs = {};
 
-    /** Set defaults for attributes at startup. */
-    #initAttributeConfigsDefaults() {
-        // @ts-ignore
-        const attrConfigs = this.constructor.attributeConfigs || {};
-
-        for (let [attrName, config] of Object.entries(attrConfigs)) {
-            if (this.hasAttribute(attrName) === false && 'default' in config) {
-                switch (config?.type) {
-                    case 'boolean':
-                        if (config?.default) this.setAttribute(attrName, '');
-                        break;
-                    case 'number':
-                        // @ts-ignore
-                        this.setAttribute(attrName, String(parseInt(config?.default, 10)));
-                        break;
-                    default:
-                        this.setAttribute(attrName, String(config?.default));
-                }
-            }
-        }
-    }
-
     /**
      * Pre-process an attribute value, applying the defaults and casting the type.
      *
      * @param {string} attrName Name of the attribute.
-     * @param {string} value Attribute's value that is to be processed, as read from the attribute.
+     * @param {(string|number)} value Attribute's value that is to be processed, as read from the attribute.
      * @returns {*} The value after processing.
      */
     #preProcessAttribute(attrName, value) {
-        let processed;
-
         /** @type {AttributeConfig} */ // @ts-ignore
         const config = this.constructor.attributeConfigs[attrName] ?? {};
 
         // Apply the default if need
         if (value === null && 'default' in config) {
-            processed = config.default;
+            value = config.default;
         }
 
         // Cast the value if number or boolean
         const type = config?.type ?? 'string';
         if (type == 'number') {
-            processed = parseFloat(value);
-        } else if (type == 'boolean') {
-            // BUG: Should this be here?
-            processed = !!value;
+            // @ts-ignore
+            value = parseFloat(value);
         }
 
-        return processed ?? value;
+        return value;
     }
 
     // endregion
@@ -217,6 +190,11 @@ export default class HTMLElementPlus extends HTMLElement {
             if (config?.reflected) {
                 const readOnly = !!config?.readOnly;
                 if (config?.type === 'boolean') {
+                    if ('default' in config) {
+                        console.warn(
+                            `HTMLElementPlus: attributeConfigs.${attrName} has a default value, which is not supported on boolean reflections.`,
+                        );
+                    }
                     this.#addBooleanReflection(attrName, readOnly);
                 } else {
                     this.#addValueReflection(attrName, readOnly);

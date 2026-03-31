@@ -91,7 +91,7 @@ This behaviour is set in the _attributeConfigs_ static property as an object, wi
 | type | string | `'string'` | Defines the casting and behaviour of the attribute. See [Attribute Types](#attribute-types) below for details. |
 | reflected | boolean | `false` | Indicates whether a [reflected property](#reflected-property) is created for this attribute. If set to `false`, defaults and typing will only be applied to [observed attributes](#observed-attributes). |
 | readOnly | boolean | `false` | Whether the reflected property is read-only or is editable. Has no effect if _reflected_ is `false`. |
-| default | string \| number \| boolean | `null` | Will automatically set the attribute to this value at startup if it not already set in the HTML. This is regardless of whether its observed, reflected, or neither. Use the type which corresponds to the configured type. |
+| default | string \| number | `null` | If the attribute is not set, reflected and observed attributes will default to this value. Has no effect if _type_ is `'boolean'`. |
 
 ```js
 class MyComponent extends HTMLElementPlus {
@@ -109,16 +109,16 @@ class MyComponent extends HTMLElementPlus {
 The _type_ value in the attribute configuration can be one of the following:
 
 - **`'string'`**: The default. Attribute value will be kept as a string.
-- **`'number'`**: The attribute (which is always a string) will be cast to a number before being reflected or observed. If the value is not a number, will return `NaN`. With reflections, the casting is applied in both the setter and the getter.
-- **`'boolean'`**: The attribute behaves based on presence only, with a `true` value indicating the attribute is present. The string value set in the attribute is ignored.
+- **`'number'`**: The attribute (which is always a string) will be cast to a number before being reflected or observed. If the value is not a number, will return `NaN`. With reflections, the setter will set the attribute to `"NaN"` if a non-numeric value is provided.
+- **`'boolean'`**: The attribute behaves based on presence only, with a `true` value indicating the attribute is present. The value of the attribute is ignored.
 
-The properties of reflected boolean attributes always return a boolean. Other properties of other reflected attributes return the value itself (after casting to a number if applicable) or when not set return the default or null.
+The value returned by reflected or observed boolean attributes is always a boolean. Other properties of other reflected or observed attributes return the value itself (after casting to a number if applicable) or when not set return the default or null.
 
 #### Reflected Property
 
 When _reflected_ is set to true, the attributes become available as a property within the class and can be read and changed using this property. See [Reflected attributes on MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Reflected_attributes) for more details.
 
-The default value, read-only setting, and type casting to number will be applied to the properties. If a reflected property is set to null, the attribute is removed.
+The default value, read-only setting, and type casting to number will be applied to the properties. If a reflected property is set to null, the attribute is removed and returns its default value if applicable.
 
 > 🐍 **Snake-Case Names**  
 > Attributes that use snake-case names which will get an equivalent property name using camel-case. For example, the attribute name `my-data` will become `this.myData` when reflected.

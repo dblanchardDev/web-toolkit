@@ -135,7 +135,6 @@ export default class HTMLElementPlus extends HTMLElement {
     // BUG: default for a boolean attributes doesn't work as a default of true doesn't result in the attribute being present. Same really for value attributes.
     // FIXME: ensure that on setting reflected to null, the default is used and whether that's desired
     // FIXME: Consider freezing configurations once used.
-    // FIXME: Type hints for on-change methods may include numbers that have been pre-cast
 
     /**
      * Object used to define the configuration of attributes in {@link attributeConfigs}.
@@ -383,7 +382,7 @@ export default class HTMLElementPlus extends HTMLElement {
     /**
      * Invoked once all observed attributes that will have a value or default are set. Called only once at load time. Values will be passed through {@link defaultAttributes} and {@link attributesParser}. Will only be called once after loading, after which {@link onAttributeChange} should be used.
      *
-     * @param {Object<string, *>[]} attributes - All observed attributes as key-value pairs where the key is the attribute name and the value the attribute's value.
+     * @param {Object<string, (string|number)>[]} attributes - All observed attributes as key-value pairs where the key is the attribute name and the value the attribute's value.
      */
     // eslint-disable-next-line no-unused-vars
     onAllAttributesSet(attributes) {
@@ -394,8 +393,8 @@ export default class HTMLElementPlus extends HTMLElement {
      * Invoke each time an observed attribute changes value. Unlike {@link attributeChangedCallback}, the values are pre-processed by {@link defaultAttributes} and {@link attributesParser}. Additionally, it is not invoked at load time, instead deferring this duty to {@link onAllAttributesSet}.
      *
      * @param {string} name - Name of the attribute.
-     * @param {*} oldValue - Attribute's previous value.
-     * @param {*} newValue - Attribute's new value.
+     * @param {(string|number)} oldValue - Attribute's previous value.
+     * @param {(string|number)} newValue - Attribute's new value.
      */
     // eslint-disable-next-line no-unused-vars
     onAttributeChange(name, oldValue, newValue) {

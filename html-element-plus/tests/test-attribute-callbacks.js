@@ -51,7 +51,7 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
             'no-default': 'NO-DEFAULT',
             default: 'DEFAULT',
             number: 0,
-            presence: false,
+            boolean: false,
         };
 
         if (compareDicts(expected, attributes)) {

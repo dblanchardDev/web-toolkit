@@ -8,6 +8,7 @@
  *     without the express permission of David Blanchard.
  */
 
+// TODO: Freeze static attributeConfigs and static internalStates on first read
 // TODO HTML Rendering/Fetching
 // TODO CSS Rendering/Fetching
 // TODO Await for DOM ready and attributes reflected
@@ -131,9 +132,6 @@ export default class HTMLElementPlus extends HTMLElement {
     // endregion
     // region: ATTRIBUTE CONFIGURATION
 
-    // BUG: when an attribute is of type boolean, the observation doesn't work in the same way instead casting the value to a boolean
-    // FIXME: Consider freezing configurations once used
-
     /**
      * Object used to define the configuration of attributes in {@link attributeConfigs}.
      * @typedef {{type?: ('string'|'number'|'boolean'), reflected?: boolean, readOnly?: boolean, default?: (string|number)}} AttributeConfig
@@ -176,6 +174,7 @@ export default class HTMLElementPlus extends HTMLElement {
      * @returns {*} The value after processing.
      */
     #preProcessAttribute(attrName, value) {
+        // BUG: Logic does not pre-process boolean attributes for observed
         const config = this.attributeConfigs[attrName] ?? {};
 
         // Apply the default if need
@@ -340,30 +339,31 @@ export default class HTMLElementPlus extends HTMLElement {
     }
 
     /**
-     * List of observed attributes which are defined on the HTML element at load and for which we must wait before calling {@link onAllAttributesSet}.
+     * List of observed attributes which are defined on the HTML element at load and for which we must wait before calling {@link onAllAttributesSet}. Afterwards, this property gets nulled to indicate all attributes already processed.
      *
-     * @type {string[]}
+     * @type {?string[]}
      */
     #awaitedAttributes = [];
 
     /**
-     * Store each resulting property as it gets loaded in order to invoke {@link onAllAttributesSet}, after which this property gets nulled to indicate all attributes already processed.
+     * Store each resulting property as it gets loaded in order to invoke {@link onAllAttributesSet}. Afterwards, this property gets set to null to release the memory usage.
      *
      * @type {?Object<string, *>[]}
      */
-    #awaitedProperties = [];
+    #accumulatedProperties = [];
 
-    /** Initialize the logic required for {@link onAllAttributesSet} and {@link onAttributeSet}.
-     * This is in addition to the {@link attributeChangedCallback} which is responsible for calling {@link #handleAttributeChangedCallback}. */
+    /** Initialize the logic required for {@link onAllAttributesSet} and {@link onAttributeSet}. This is in addition to the {@link attributeChangedCallback} which is responsible for calling {@link handleAttributeChangedCallback}. */
     #initOnAttributeChanges() {
         // List out all observed attributes that are set so their value can be awaited
+        // BUG: Add unset defaults to awaited properties
+        // BUG: Add unset booleans to awaited properties (should be false)
         this.#awaitedAttributes = this.observedAttribute.filter((attrName) => {
             return !!this.attributes.getNamedItem(attrName);
         });
     }
 
     /**
-     * Handle the attribute change internally, either accumulating the changes to call {@link onAllAttributesSet}, or once all attributes are set, call {@link onAttributeChange} for each change.
+     * Handle the attribute change internally, either accumulating the changes to call {@link onAllAttributesSet}, or after all attributes are set, call {@link onAttributeChange} for each change.
      *
      * @param {string} name Name of the attribute which changed.
      * @param {string} oldValue Value of the attribute before the change.
@@ -374,22 +374,18 @@ export default class HTMLElementPlus extends HTMLElement {
         const newProcessed = this.#preProcessAttribute(name, newValue);
 
         // Accumulating properties before calling onAllAttributesSet
-        if (this.#awaitedProperties !== null) {
+        if (this.#awaitedAttributes !== null) {
             // Accumulate property for later
-            this.#awaitedProperties[name] = newProcessed;
+            this.#accumulatedProperties[name] = newProcessed;
 
             // No longer awaiting this attribute, so remove
-            const awaitingIndex = this.#awaitedAttributes.indexOf(name);
-            if (awaitingIndex > -1) {
-                this.#awaitedAttributes.splice(awaitingIndex, 1);
-            }
+            this.#awaitedAttributes = this.#awaitedAttributes.filter((n) => n !== name);
 
             // If last property set, finish call to onAllAttributesSet
             if (this.#awaitedAttributes.length == 0) {
-                //@ts-ignore
-                const withDefaults = {...this.constructor.defaultAttributes, ...this.#awaitedProperties};
-                this.onAllAttributesSet(withDefaults);
-                this.#awaitedProperties = null;
+                this.onAllAttributesSet(this.#accumulatedProperties);
+                this.#awaitedAttributes = null;
+                this.#accumulatedProperties = null;
             }
         }
         // All already set, this is a change
@@ -446,7 +442,7 @@ export default class HTMLElementPlus extends HTMLElement {
      */
     get internalStates() {
         // @ts-ignore
-        return this.constructor.internalStates() || {};
+        return this.constructor?.internalStates || {};
     }
 
     /** Initialize the element internals states, creating the reflected properties and setting initial status. */

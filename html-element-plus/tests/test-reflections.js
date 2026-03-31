@@ -3,14 +3,16 @@
 import TestHTMLElementPlus from './TestHTMLElementPlus.js';
 
 class TestReflections extends TestHTMLElementPlus {
-    static reflectedAttributes = {
-        alpha: {},
-        bravo: {readOnly: true},
-        'charlie-delta': {},
-        present: {boolean: true},
-        unchanged: {boolean: true, readOnly: true},
-        unset: {},
-        internals: {state: true},
+    static attributeConfigs = {
+        alpha: {reflected: true},
+        bravo: {reflected: true, readOnly: true},
+        'charlie-delta': {reflected: true},
+        present: {reflected: true, type: 'boolean'},
+        unchanged: {reflected: true, type: 'boolean', readOnly: true},
+        unset: {reflected: true},
+        count: {reflected: true, type: 'number'},
+        nan: {reflected: true, type: 'number'},
+        unreflected: {},
     };
 
     constructor() {
@@ -24,7 +26,8 @@ class TestReflections extends TestHTMLElementPlus {
         this.#testReadOnlyBoolean();
         this.#testUnset();
         this.#testUnreflected();
-        this.#testInternals();
+        this.#testNumberCasting();
+        this.#testNotANumber();
     }
 
     #testSettableValue() {
@@ -122,36 +125,16 @@ class TestReflections extends TestHTMLElementPlus {
         else this.pass(label);
     }
 
-    #testInternals() {
-        const style = document.createElement('style');
-        style.textContent = `
-            #testInternals {
-                &:before {
-                    content: "❌ ";
-                }
-                &:after {
-                    content: " Failed - CSS State Not Applied";
-                }
-            }
+    #testNumberCasting() {
+        const label = 'Number Casting';
+        if (this?.count === 22) this.pass(label);
+        else this.fail(label, 'Unexpected Value');
+    }
 
-            :host(:state(internals)) {
-                #testInternals {
-                    &:before {
-                        content: "✅ ";
-                    }
-                    &:after {
-                        content: " Successful";
-                    }
-                }
-            }
-        `;
-        this.shadowRoot.appendChild(style);
-
-        const div = document.createElement('div');
-        div.setAttribute('id', 'testInternals');
-        div.textContent = 'Element Internals State';
-        this.shadowRoot.appendChild(div);
-        this.internals = true;
+    #testNotANumber() {
+        const label = 'Not A Number Casting';
+        if (Number.isNaN(this?.nan)) this.pass(label);
+        else this.fail(label, 'Unexpected Value');
     }
 }
 

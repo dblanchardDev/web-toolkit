@@ -192,8 +192,6 @@ export default class HTMLElementPlus extends HTMLElement {
         const attrConfigs = this.constructor.attributeConfigs || {};
 
         for (let [attrName, config] of Object.entries(attrConfigs)) {
-            if (!Object.is(config)) config = {};
-
             if (config?.reflected) {
                 const readOnly = !!config?.readOnly;
                 if (config?.type === 'boolean') {

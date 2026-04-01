@@ -38,6 +38,15 @@ class MyComponent extends HTMLElementPlus {
 customElements.define('my-component', MyComponent);
 ```
 
+### Browser Compatibility
+
+This tool should be compatible with the latest version of all modern evergreen browsers and is tested against:
+
+- Mozilla Firefox on Windows and Android
+- Microsoft Edge on Windows and Android
+- Google Chrome on Windows, Android
+- Apple Safari on iOS
+
 ---
 
 ## Features

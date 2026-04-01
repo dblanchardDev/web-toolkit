@@ -27,44 +27,70 @@
                 margin-bottom: 10px;
             }
         </style>
+
+        <script>
+            setTimeout(() => {
+                for (const section of document.querySelectorAll('section')) {
+                    const expected = parseInt(section.dataset.count, 10);
+                    const actual = section?.lastElementChild?.shadowRoot?.querySelectorAll('div')?.length;
+
+                    if (expected !== actual) {
+                        const div = document.createElement('div');
+                        div.textContent = '🛑 Not All Tests Ran';
+                        section.appendChild(div);
+                    }
+                }
+                document.getElementById('running').remove();
+            }, 3000);
+        </script>
     </head>
     <body>
         <h1>HTMLElementPlus Tests</h1>
 
-        <h2>Element References</h2>
-        <small>Expect 3 tests results</small>
-        <test-references></test-references>
+        <div id="running">⌛ Running Tests</div>
 
-        <h2>Dispatching Events</h2>
-        <small>Expect 2 tests results</small>
-        <test-events></test-events>
+        <section data-count="3">
+            <h2>Element References</h2>
+            <small>Expect 3 tests results</small>
+            <test-references></test-references>
+        </section>
 
-        <h2>Attribute Reflections</h2>
-        <small>Expect 16 tests results</small>
-        <test-reflections
-            alpha="A"
-            bravo="B"
-            charlie-delta="CD"
-            present
-            unchanged
-            unreflected="NO"
-            count="22"
-            nan="not a number"
-            set-default="SET"
-            set-null="NOT NULL"
-        ></test-reflections>
+        <section data-count="2">
+            <h2>Dispatching Events</h2>
+            <small>Expect 2 tests results</small>
+            <test-events></test-events>
+        </section>
 
-        <h2>Attribute Callbacks</h2>
-        <small>Expect 12 tests results</small>
-        <test-attribute-callbacks
-            string="STRING"
-            string-default-set="STRING-DEFAULT-SET"
-            string-to-null="TO-BE-NULL"
-            number="12.5"
-            number-to-null="74"
-            number-nan="abcd"
-            boolean-set
-            boolean-to-null
-        ></test-attribute-callbacks>
+        <section data-count="16">
+            <h2>Attribute Reflections</h2>
+            <small>Expect 16 tests results</small>
+            <test-reflections
+                alpha="A"
+                bravo="B"
+                charlie-delta="CD"
+                present
+                unchanged
+                unreflected="NO"
+                count="22"
+                nan="not a number"
+                set-default="SET"
+                set-null="NOT NULL"
+            ></test-reflections>
+        </section>
+
+        <section data-count="12">
+            <h2>Attribute Callbacks</h2>
+            <small>Expect 12 tests results</small>
+            <test-attribute-callbacks
+                string="STRING"
+                string-default-set="STRING-DEFAULT-SET"
+                string-to-null="TO-BE-NULL"
+                number="12.5"
+                number-to-null="74"
+                number-nan="abcd"
+                boolean-set
+                boolean-to-null
+            ></test-attribute-callbacks>
+        </section>
     </body>
 </html>

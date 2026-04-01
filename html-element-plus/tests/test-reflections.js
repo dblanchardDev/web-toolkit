@@ -42,6 +42,8 @@ class TestReflections extends TestHTMLElementPlus {
         this.#testNumberDefault();
         this.#testNothing();
         this.#setAttributeToNull();
+        this.#testFrozen();
+        this.#testInnerFrozen();
     }
 
     #testSettableValue() {
@@ -210,6 +212,44 @@ class TestReflections extends TestHTMLElementPlus {
         this.setNull = null;
         if (this.getAttribute('set-null') === null) this.pass(label);
         else this.fail(label, 'Attribute Not Removed When Nulled');
+    }
+
+    #testFrozen() {
+        const label = 'Attribute Configs Frozen';
+
+        try {
+            this.constructor.attributeConfigs.WRONG = {};
+            this.fail(label, 'Object Extendable');
+        } catch (error) {
+            if (error.name !== 'TypeError') this.fail(label, 'Unexpected Error Type');
+
+            try {
+                this.constructor.attributeConfigs.alpha = {};
+                this.fail(label, 'Object Writable');
+            } catch (innerError) {
+                if (innerError.name !== 'TypeError') this.fail(label, 'Unexpected Error Type');
+                else this.pass(label);
+            }
+        }
+    }
+
+    #testInnerFrozen() {
+        const label = 'Attribute Configs Inner Config Frozen';
+
+        try {
+            this.constructor.attributeConfigs.alpha.WRONG = false;
+            this.fail(label, 'Object Extendable');
+        } catch (error) {
+            if (error.name !== 'TypeError') this.fail(label, 'Unexpected Error Type');
+
+            try {
+                this.constructor.attributeConfigs.alpha.reflected = null;
+                this.fail(label, 'Object Writable');
+            } catch (innerError) {
+                if (innerError.name !== 'TypeError') this.fail(label, 'Unexpected Error Type');
+                else this.pass(label);
+            }
+        }
     }
 }
 

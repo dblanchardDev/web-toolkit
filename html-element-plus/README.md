@@ -114,7 +114,7 @@ class MyComponent extends HTMLElementPlus {
 }
 ```
 
-The _attributesConfigs_ property is also made available as a read only class property.
+The _attributesConfigs_ property is also made available as a read only class property. Both the static and instance version of this property will be frozen to prevent modification on first initialization.
 
 #### Attribute Types
 
@@ -191,7 +191,7 @@ class MyComponent extends HTMLElementPlus {
     }
 ```
 
-The _internalStates_ property is also made available as a read only class property.
+The _internalStates_ property is also made available as a read only class property. Both the static and instance version of this property will be frozen to prevent modification on first initialization.
 
 ### Connected Callback Skipped on Move
 

@@ -8,7 +8,6 @@
  *     without the express permission of David Blanchard.
  */
 
-// TODO: Freeze static attributeConfigs and static internalStates on first read
 // TODO HTML Rendering/Fetching
 // TODO CSS Rendering/Fetching
 // TODO Internationalization/dictionary structure?
@@ -202,7 +201,12 @@ export default class HTMLElementPlus extends HTMLElement {
 
     /** Initialize the reflection of HTML attributes to class properties. */
     #initReflections() {
+        const isFrozen = Object.isFrozen(this.attributeConfigs);
+        if (!isFrozen) Object.freeze(this.attributeConfigs);
+
         for (let [attrName, config] of Object.entries(this.attributeConfigs)) {
+            if (!isFrozen) Object.freeze(config);
+
             if (config?.reflected) {
                 const readOnly = !!config?.readOnly;
                 if (config?.type === 'boolean') {
@@ -462,6 +466,8 @@ export default class HTMLElementPlus extends HTMLElement {
     /** Initialize the element internals states, creating the reflected properties and setting initial status. */
     #initInternalStates() {
         this.#internals = this.attachInternals();
+
+        Object.freeze(this.internalStates);
 
         for (let [stateName, initiallyPresent] of Object.entries(this.internalStates)) {
             const propName = this.#addStateReflection(stateName);

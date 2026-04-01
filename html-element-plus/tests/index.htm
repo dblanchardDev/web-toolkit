@@ -17,6 +17,7 @@
         <script src="test-events.js" type="module"></script>
         <script src="test-reflections.js" type="module"></script>
         <script src="test-attribute-callbacks.js" type="module"></script>
+        <script src="test-internals-state.js" type="module"></script>
 
         <style>
             h2 {
@@ -51,19 +52,19 @@
 
         <section data-count="3">
             <h2>Element References</h2>
-            <small>Expect 3 tests results</small>
+            <small>Expect 3 test results</small>
             <test-references></test-references>
         </section>
 
         <section data-count="2">
             <h2>Dispatching Events</h2>
-            <small>Expect 2 tests results</small>
+            <small>Expect 2 test results</small>
             <test-events></test-events>
         </section>
 
         <section data-count="18">
             <h2>Attribute Reflections</h2>
-            <small>Expect 18 tests results</small>
+            <small>Expect 18 test results</small>
             <test-reflections
                 alpha="A"
                 bravo="B"
@@ -80,7 +81,7 @@
 
         <section data-count="12">
             <h2>Attribute Callbacks</h2>
-            <small>Expect 12 tests results</small>
+            <small>Expect 12 test results</small>
             <test-attribute-callbacks
                 string="STRING"
                 string-default-set="STRING-DEFAULT-SET"
@@ -91,6 +92,12 @@
                 boolean-set
                 boolean-to-null
             ></test-attribute-callbacks>
+        </section>
+
+        <section data-count="8">
+            <h2>Internals States</h2>
+            <small>Expect 8 test results</small>
+            <test-internals-state></test-internals-state>
         </section>
     </body>
 </html>

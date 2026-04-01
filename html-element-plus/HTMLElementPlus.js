@@ -2,10 +2,6 @@
  * @file HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
  *
  * @since March 2026
- *
- * @copyright Copyright 2026 David Blanchard. All rights reserved.
- *     The content of this file must not be copied or reproduced in any manner
- *     without the express permission of David Blanchard.
  */
 
 // TODO HTML Rendering/Fetching

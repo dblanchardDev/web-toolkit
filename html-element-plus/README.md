@@ -42,9 +42,9 @@ customElements.define('my-component', MyComponent);
 
 This tool should be compatible with the latest version of all modern evergreen browsers and is tested against:
 
-- Mozilla Firefox on Windows and Android
-- Microsoft Edge on Windows and Android
-- Google Chrome on Windows, Android
+- Mozilla Firefox on Windows, Android, and iOS
+- Microsoft Edge on Windows, and Android
+- Google Chrome on Windows, Android, and iOS
 - Apple Safari on iOS
 
 ---

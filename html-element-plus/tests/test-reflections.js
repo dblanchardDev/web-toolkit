@@ -4,58 +4,66 @@ import TestHTMLElementPlus from './TestHTMLElementPlus.js';
 
 class TestReflections extends TestHTMLElementPlus {
     static attributeConfigs = {
-        alpha: {reflected: true},
-        bravo: {reflected: true, readOnly: true},
-        'charlie-delta': {reflected: true},
-        present: {reflected: true, type: 'boolean'},
-        unchanged: {reflected: true, type: 'boolean', readOnly: true},
-        unset: {reflected: true},
-        count: {reflected: true, type: 'number'},
+        'snake-case': {reflected: true},
+        string: {reflected: true},
+        readonly: {reflected: true, readOnly: true},
+        number: {reflected: true, type: 'number'},
+        'readonly-number': {reflected: true, type: 'number', readOnly: true},
         nan: {reflected: true, type: 'number'},
-        unreflected: {},
-        'unset-default': {reflected: true, default: 'UNSET DEFAULT'},
+        'to-nan': {reflected: true, type: 'number'},
+        boolean: {reflected: true, type: 'boolean'},
+        'readonly-boolean': {reflected: true, type: 'boolean', readOnly: true},
+        unset: {reflected: true},
+        'unset-default': {reflected: true, default: 'UNSET-DEFAULT'},
         'unset-number-default': {reflected: true, default: 9999, type: 'number'},
         'unset-boolean-default': {reflected: true, default: true, type: 'boolean'},
         'set-default': {reflected: true, default: 'DEFAULT'},
-        'count-default': {reflected: true, default: '123', type: 'number'},
-        nothing: {reflected: true},
+        unreflected: {},
         'set-null': {reflected: true},
+        nothing: {reflected: true},
     };
 
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
 
-        this.#testSettableValue();
-        this.#testReadOnlyValue();
         this.#testSnakeToPascal();
+        this.#testSettableString();
+        this.#testReadOnlyString();
+        this.#testSettableNumber();
+        this.#testReadOnlyNumber();
+        this.#testReadNotANumber();
+        this.#testSetNotANumber();
         this.#testSettableBoolean();
         this.#testReadOnlyBoolean();
         this.#testUnset();
-        this.#testUnreflected();
-        this.#testNumberCasting();
-        this.#testNotANumber();
         this.#testUnsetDefault();
         this.#testUnsetNumberDefault();
         this.#testUnsetBooleanDefault();
         this.#testSetDefault();
-        this.#testNumberDefault();
-        this.#testNothing();
+        this.#testUnreflected();
         this.#setAttributeToNull();
+        this.#testNothing();
         this.#testFrozen();
         this.#testInnerFrozen();
     }
 
-    #testSettableValue() {
-        const label = 'Settable Value';
-        if (this?.alpha !== 'A') {
+    #testSnakeToPascal() {
+        const label = 'Snake-case to Camel-case';
+        if (this?.snakeCase !== 'SNAKE-CASE') this.fail(label, 'Unreadable');
+        else this.pass(label);
+    }
+
+    #testSettableString() {
+        const label = 'Settable String';
+        if (this?.string !== 'STRING') {
             this.fail(label, 'Unreadable');
         } else {
             try {
-                this.alpha = 'ALPHA';
-                if (this.alpha !== 'ALPHA') {
+                this.string = 'NEW-STRING';
+                if (this.string !== 'NEW-STRING') {
                     this.fail(label, 'Get Returned Wrong Value After Set');
-                } else if (this.getAttribute('alpha') !== 'ALPHA') {
+                } else if (this.getAttribute('string') !== 'NEW-STRING') {
                     this.fail(label, 'Set Value Not Reflected to Attribute');
                 } else {
                     this.pass(label);
@@ -67,39 +75,69 @@ class TestReflections extends TestHTMLElementPlus {
         }
     }
 
-    #testReadOnlyValue() {
-        const label = 'Read-only Value';
-        if (this?.bravo !== 'B') {
+    #testReadOnlyString() {
+        const label = 'Read-only String';
+        if (this?.readonly !== 'READONLY') {
             this.fail(label, 'Unreadable');
         } else {
             try {
-                this.bravo = 'BRAVO';
-                if (this.bravo === 'BRAVO') this.fail(label, 'Is Not Read-Only');
+                this.readonly = 'NEW-READONLY';
+                if (this.readonly === 'NEW-READONLY') this.fail(label, 'Is Not Read-Only');
                 else this.fail(label, 'Did Not Throw Read-only Error');
             } catch (error) {
                 if (error.name != 'TypeError') this.fail(label, 'Not TypeError');
-                else if (this.getAttribute('bravo') !== 'B') this.fail(label, 'Attribute Changed');
+                else if (this.getAttribute('readonly') !== 'READONLY') this.fail(label, 'Attribute Changed');
                 else this.pass(label);
             }
         }
     }
 
-    #testSnakeToPascal() {
-        const label = 'Snake-case to Camel-case';
-        if (this?.charlieDelta !== 'CD') this.fail(label, 'Unreadable');
-        else this.pass(label);
+    #testSettableNumber() {
+        const label = 'Settable Number';
+        if (this?.number === 22.5) this.pass(label);
+        else this.fail(label, 'Unexpected Value');
+    }
+
+    #testReadOnlyNumber() {
+        const label = 'Read-only Number';
+        if (this?.readonlyNumber !== 1234) {
+            this.fail(label, 'Unreadable');
+        } else {
+            try {
+                this.readonlyNumber = 9999;
+                if (this.readonlyNumber === 9999) this.fail(label, 'Is Not Read-Only');
+                else this.fail(label, 'Did Not Throw Read-only Error');
+            } catch (error) {
+                if (error.name != 'TypeError') this.fail(label, 'Not TypeError');
+                else if (this.getAttribute('readonly-number') !== '1234') this.fail(label, 'Attribute Changed');
+                else this.pass(label);
+            }
+        }
+    }
+
+    #testReadNotANumber() {
+        const label = 'Read Not A Number';
+        if (Number.isNaN(this?.nan)) this.pass(label);
+        else this.fail(label, 'Unexpected Value');
+    }
+
+    #testSetNotANumber() {
+        const label = 'Set Not A Number';
+        this.toNan = 'NOT';
+        if (this.getAttribute('to-nan') === 'NaN') this.pass(label);
+        else this.fail(label, 'Setter Not Converting to NaN');
     }
 
     #testSettableBoolean() {
         const label = 'Settable Boolean';
-        if (this?.present !== true) {
+        if (this?.boolean !== true) {
             this.fail(label, 'Unreadable');
         } else {
             try {
-                this.present = false;
-                if (this.present !== false) {
+                this.boolean = false;
+                if (this.boolean !== false) {
                     this.fail(label, 'Get Returned Wrong Value After Set');
-                } else if (this.hasAttribute('present') !== false) {
+                } else if (this.hasAttribute('boolean') !== false) {
                     this.fail(label, 'Set Value Not Reflected to Attribute');
                 } else {
                     this.pass(label);
@@ -113,16 +151,16 @@ class TestReflections extends TestHTMLElementPlus {
 
     #testReadOnlyBoolean() {
         const label = 'Read-only Boolean';
-        if (this?.unchanged !== true) {
+        if (this?.readonlyBoolean !== true) {
             this.fail(label, 'Unreadable');
         } else {
             try {
-                this.unchanged = false;
-                if (this.unchanged === false) this.fail(label, 'Is Not Read-Only');
+                this.readonlyBoolean = false;
+                if (this.readonlyBoolean === false) this.fail(label, 'Is Not Read-Only');
                 else this.fail(label, 'Did Not Throw Read-only Error');
             } catch (error) {
                 if (error.name != 'TypeError') this.fail(label, 'Not TypeError');
-                else if (this.hasAttribute('unchanged') !== true) this.fail('Attribute Changed');
+                else if (this.hasAttribute('readonly-boolean') !== true) this.fail(label, 'Attribute Changed');
                 else this.pass(label);
             }
         }
@@ -134,30 +172,11 @@ class TestReflections extends TestHTMLElementPlus {
         else this.pass(label);
     }
 
-    #testUnreflected() {
-        const label = 'Unreflected';
-        // eslint-disable-next-line no-undefined -- no alternative
-        if (this?.unreflected !== undefined) this.fail(label, 'Reflected When it Should Not');
-        else this.pass(label);
-    }
-
-    #testNumberCasting() {
-        const label = 'Number Casting';
-        if (this?.count === 22) this.pass(label);
-        else this.fail(label, 'Unexpected Value');
-    }
-
-    #testNotANumber() {
-        const label = 'Not A Number Casting';
-        if (Number.isNaN(this?.nan)) this.pass(label);
-        else this.fail(label, 'Unexpected Value');
-    }
-
     #testUnsetDefault() {
         const label = 'Unset Default';
         if (this.getAttribute('unset-default') !== null) {
             this.fail(label, 'Unset Default Attribute Was Set in HTML');
-        } else if (this.unsetDefault !== 'UNSET DEFAULT') {
+        } else if (this.unsetDefault !== 'UNSET-DEFAULT') {
             this.fail(label, 'Default Not Returned');
         } else {
             this.pass(label);
@@ -195,15 +214,10 @@ class TestReflections extends TestHTMLElementPlus {
         else this.pass(label);
     }
 
-    #testNumberDefault() {
-        const label = 'Number Casting of Default';
-        if (this.countDefault !== 123) this.fail(label, 'Unexpected Value');
-        else this.pass(label);
-    }
-
-    #testNothing() {
-        const label = 'No Default Not Set';
-        if (this.nothing !== null) this.fail(label, 'Not Null');
+    #testUnreflected() {
+        const label = 'Unreflected';
+        // eslint-disable-next-line no-undefined -- no alternative
+        if (this?.unreflected !== undefined) this.fail(label, 'Reflected When it Should Not');
         else this.pass(label);
     }
 
@@ -212,6 +226,12 @@ class TestReflections extends TestHTMLElementPlus {
         this.setNull = null;
         if (this.getAttribute('set-null') === null) this.pass(label);
         else this.fail(label, 'Attribute Not Removed When Nulled');
+    }
+
+    #testNothing() {
+        const label = 'No Default Not Set';
+        if (this.nothing !== null) this.fail(label, 'Not Null');
+        else this.pass(label);
     }
 
     #testFrozen() {

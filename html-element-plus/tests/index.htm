@@ -62,20 +62,22 @@
             <test-events></test-events>
         </section>
 
-        <section data-count="18">
+        <section data-count="19">
             <h2>Attribute Reflections</h2>
-            <small>Expect 18 test results</small>
+            <small>Expect 19 test results</small>
             <test-reflections
-                alpha="A"
-                bravo="B"
-                charlie-delta="CD"
-                present
-                unchanged
-                unreflected="NO"
-                count="22"
-                nan="not a number"
+                snake-case="SNAKE-CASE"
+                string="STRING"
+                readonly="READONLY"
+                number="22.5"
+                readonly-number="1234"
+                nan="NOT-A-NUMBER"
+                to-nan="22"
+                boolean
+                readonly-boolean
                 set-default="SET"
-                set-null="NOT NULL"
+                unreflected="UNREFLECTED"
+                set-null="NOT-NULL"
             ></test-reflections>
         </section>
 

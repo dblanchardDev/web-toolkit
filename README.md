@@ -2,11 +2,11 @@
 
 # Web Toolkit
 
-Various tools and wrappers I use regularly to simplify HTML/CSS/JavaScript web development.
+Various tools and wrappers I use regularly to simplify HTML/CSS/JavaScript web development. Includes HTMLElementPlus to simplify native web component development, and Remedy CSS to apply a simple CSS reset.
 
 ## Tools
 
-- [**HTML Element Plus**](./html-element-plus/README.md): HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
+- [**HTML Element Plus**](./html-element-plus/README.md): HTML Element wrapper which adds various utility methods that simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
 - [**Remedy CSS**](./remedy-css/README.md): A slightly modified version of [Jen Simmon's CSS Remedy](https://github.com/jensimmons/cssremedy), a simple CSS reset.
 
 ## Licenses

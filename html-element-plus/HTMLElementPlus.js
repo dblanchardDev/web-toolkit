@@ -11,6 +11,7 @@
 // TODO: Freeze static attributeConfigs and static internalStates on first read
 // TODO HTML Rendering/Fetching
 // TODO CSS Rendering/Fetching
+// TODO Internationalization/dictionary structure?
 // TODO Await for DOM ready and attributes reflected
 
 /**

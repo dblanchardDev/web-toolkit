@@ -1,4 +1,3 @@
-// @ts-check
 /**
  * @file HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
  *
@@ -9,8 +8,10 @@
  *     without the express permission of David Blanchard.
  */
 
+// TODO: Freeze static attributeConfigs and static internalStates on first read
 // TODO HTML Rendering/Fetching
 // TODO CSS Rendering/Fetching
+// TODO Internationalization/dictionary structure?
 // TODO Await for DOM ready and attributes reflected
 
 /**
@@ -19,14 +20,15 @@
  * @class HTMLElementPlus
  * @typedef {HTMLElementPlus}
  * @extends {HTMLElement}
- */
+ */ //@ts-ignore
 export default class HTMLElementPlus extends HTMLElement {
     constructor() {
         super();
 
         this.#initRefAccess();
-        this.#initReflectedAttributes();
+        this.#initReflections();
         this.#initOnAttributeChanges();
+        this.#initInternalStates();
     }
 
     // region: TYPE HINTS FOR CUSTOM ELEMENT FUNCTIONS
@@ -78,7 +80,7 @@ export default class HTMLElementPlus extends HTMLElement {
     /**
      * Access shadow root HTML elements using their `ref` attribute value.
      *
-     * @type {Object<string, (HTMLElement | null)}
+     * @type {Object<string, (HTMLElement | null)>}
      */
     refs = null;
 
@@ -104,7 +106,7 @@ export default class HTMLElementPlus extends HTMLElement {
     }
 
     // endregion
-    // region: EVENTS
+    // region: EVENT DISPATCHING
 
     /**
      * Dispatch a new custom event on this custom element. It will not be composed and is therefore restricted to the shadow root.
@@ -129,75 +131,90 @@ export default class HTMLElementPlus extends HTMLElement {
     }
 
     // endregion
-    // region: DEFAULT & PARSED ATTRIBUTES
+    // region: ATTRIBUTE CONFIGURATION
 
     /**
-     * Default values for {@link reflectedAttributes}. Used when the attribute is not defined in the HTML nor set through the property. Each entry is a key-value pair where the key is the attribute name and the value the default value to be used.
-     *
-     * @static
-     * @type {Object<string, string>}
+     * Object used to define the configuration of attributes in {@link attributeConfigs}.
+     * @typedef {{type?: ('string'|'number'|'boolean'), reflected?: boolean, readOnly?: boolean, default?: (string|number)}} AttributeConfig
      */
-    static defaultAttributes = {};
 
     /**
-     * Pre-process {@link reflectedAttributes} before they are returned. This is particularly useful for type casting values as all attributes are stored as strings. This runs after retrieving default values from {@link defaultAttributes}.
+     * Listing of element attributes whose behaviour is to be modified or enhanced. Key is the attributes name and value is a configuration object:
+     *
+     * type: 'string' – keep the attribute value as a string (default); 'number' – auto-cast strings to numbers, returning NaN when needed; 'boolean' – return a boolean depending on whether the attribute is present.
+     * reflected: Boolean indicating whether the element's attributed is reflected as a property in the class. Defaults to false.
+     * readOnly: Boolean setting the reflected property to read-only (cannot be modified). Only applied to reflected attributes. Defaults to false.
+     * default: Value (string, number, or boolean) to which the property is set if the attribute is not set. The default for attributes is made available in reflections, in {@link onAllAttributesSet} and {@link onAttributeChange} when the attribute itself isn't set.
      *
      * @static
-     * @overload
-     * @param {string} attrName Name of the attribute.
-     * @param {string} value Value as read from the attribute.
-     * @returns {*} The parsed or processed value to be returned by the reflected property.
+     * @type {Object<string, AttributeConfig>}
      */
-    static attributesParser(attrName, value) {
-        return value;
+    static attributeConfigs = {};
+
+    /**
+     * Listing of element attributes whose behaviour is to be modified or enhanced. Key is the attributes name and value is a configuration object:
+     *
+     * type: 'string' – keep the attribute value as a string (default); 'number' – auto-cast strings to numbers, returning NaN when needed; 'boolean' – return a boolean depending on whether the attribute is present.
+     * reflected: Boolean indicating whether the element's attributed is reflected as a property in the class. Defaults to false.
+     * readOnly: Boolean setting the reflected property to read-only (cannot be modified). Only applied to reflected attributes. Defaults to false.
+     * default: Value (string, number, or boolean) to which the property is set if the attribute is not set. The default for attributes is made available in reflections, in {@link onAllAttributesSet} and {@link onAttributeChange} when the attribute itself isn't set.
+     *
+     * @readonly
+     * @type {Object<string, AttributeConfig>}
+     */
+    get attributeConfigs() {
+        // @ts-ignore
+        return this.constructor?.attributeConfigs ?? {};
     }
 
     /**
-     * Pre-process an attribute value, applying the defaults and invoking the parser.
+     * Pre-process an attribute value, applying the defaults and casting the type.
      *
      * @param {string} attrName Name of the attribute.
-     * @param {string} value Attribute's value that is to be processed, as read from the attribute.
+     * @param {?(string|number|boolean)} value Attribute's value that is to be processed, as read from the attribute.
      * @returns {*} The value after processing.
      */
     #preProcessAttribute(attrName, value) {
-        /** @type {Object<string, *>} */
-        const defaults = this.constructor.defaultAttributes;
+        const config = this.attributeConfigs[attrName] ?? {};
 
-        if (value === null && attrName in defaults) {
-            value = defaults[attrName];
+        if (config?.type == 'boolean') {
+            // Boolean based on presence (null is absent, other is present)
+            value = value !== null;
+        } else {
+            // Apply the default if need
+            if (value === null && 'default' in config) {
+                value = config.default;
+            }
+
+            // Cast the value if number or boolean
+            const type = config?.type ?? 'string';
+            if (type == 'number' && value !== null) {
+                // @ts-ignore
+                value = parseFloat(value);
+            }
         }
-
-        value = this.constructor.attributesParser(attrName, value);
 
         return value;
     }
 
     // endregion
-    // region: REFLECTED ATTRIBUTES
-
-    /**
-     * Listing of HTML element attributes that should be made available as properties of this custom element. The property will be reflected both ways unless it is set to read-only at which point it cannot be modified at the custom element property level. Attributes marked as boolean only have their presence reflected, whereas all other values are reflected as their string value.
-     *
-     * @static
-     * @type {Object<string, {boolean?: boolean, readOnly?: boolean, state?: boolean}>}
-     */
-    static reflectedAttributes = {};
+    // region: ATTRIBUTE REFLECTION
 
     /** Initialize the reflection of HTML attributes to class properties. */
-    #initReflectedAttributes() {
-        /** @type {Object<string, {boolean?: boolean, readOnly?: boolean, state?: boolean}>} */
-        const reflected = this.constructor.reflectedAttributes || {};
-
-        for (let [attrName, config] of Object.entries(reflected)) {
-            if (!config) config = {};
-            const readOnly = config?.readOnly || false;
-
-            if (config?.state) {
-                this.#addStateReflection(attrName);
-            } else if (config?.boolean) {
-                this.#addBooleanReflection(attrName, readOnly);
-            } else {
-                this.#addValueReflection(attrName, readOnly);
+    #initReflections() {
+        for (let [attrName, config] of Object.entries(this.attributeConfigs)) {
+            if (config?.reflected) {
+                const readOnly = !!config?.readOnly;
+                if (config?.type === 'boolean') {
+                    if ('default' in config) {
+                        console.warn(
+                            `HTMLElementPlus: attributeConfigs.${attrName} has a default value, which is not supported on boolean reflections.`,
+                        );
+                    }
+                    this.#addBooleanReflection(attrName, readOnly);
+                } else {
+                    this.#addValueReflection(attrName, readOnly);
+                }
             }
         }
     }
@@ -259,7 +276,7 @@ export default class HTMLElementPlus extends HTMLElement {
     }
 
     /**
-     * Add a value property to the component which reflects an HTML attribute. Value properties return the actual value stored in the attribute.
+     * Add a value property to the component which reflects an HTML attribute. Value properties return the actual value stored in the attribute. Defaults and type casting defined in {@link attributeConfigs} are automatically applied.
      *
      * @param {string} attrName Name of the source attribute.
      * @param {boolean} readOnly Whether the property is read-only. Will decide whether a setter is added.
@@ -284,7 +301,9 @@ export default class HTMLElementPlus extends HTMLElement {
             /* eslint-disable accessor-pairs -- get set elsewhere */
             Object.defineProperty(this, propName, {
                 set(value) {
-                    this.setAttribute(attrName, value);
+                    const castValue = this.#preProcessAttribute(attrName, value);
+                    if (castValue === null) this.removeAttribute(attrName);
+                    else this.setAttribute(attrName, castValue);
                 },
             });
             /* eslint-enable accessor-pairs */
@@ -310,99 +329,81 @@ export default class HTMLElementPlus extends HTMLElement {
         /* eslint-enable accessor-pairs */
     }
 
-    /**
-     * Internal element to store CSS internal states.
-     *
-     * @type {ElementInternals}
-     */
-    #internals = null;
-
-    /**
-     * Add a state property to the component which reflects an internal element state. See https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors for more details.
-     *
-     * @param {string} attrName Name of the state attribute.
-     * @returns {string} Name of the resulting property.
-     */
-    #addStateReflection(attrName) {
-        const propName = this.#snakeToCamel(attrName);
-
-        if (!this.#internals) this.#internals = this.attachInternals();
-
-        // Create getter
-        Object.defineProperty(this, propName, {
-            get() {
-                return this.#internals.states.has(attrName);
-            },
-            set(value) {
-                if (value) this.#internals.states.add(attrName);
-                else this.#internals.states.delete(attrName);
-            },
-        });
-
-        return propName;
-    }
-
     // endregion
     // region: ON ATTRIBUTE CHANGE
 
     /**
-     * List of observed attributes which are defined on the HTML element at load and for which we must wait before calling {@link onAllAttributesSet}.
+     * List of element attributes which will trigger callbacks on load and change.
      *
+     * @readonly
      * @type {string[]}
+     */
+    get observedAttribute() {
+        // @ts-ignore
+        return this.constructor?.observedAttributes || [];
+    }
+
+    /**
+     * List of observed attributes which are defined on the HTML element at load and for which we must wait before calling {@link onAllAttributesSet}. Afterwards, this property gets nulled to indicate all attributes already processed.
+     *
+     * @type {?string[]}
      */
     #awaitedAttributes = [];
 
     /**
-     * Store each resulting property as it gets loaded in order to invoke {@link onAllAttributesSet}, after which this property gets nulled to indicate all attributes already processed.
+     * Store each resulting property as it gets loaded in order to invoke {@link onAllAttributesSet}. Afterwards, this property gets set to null to release the memory usage.
      *
-     * @type {?Object<string, *>[]}
+     * @type {?Object<string, (string|number|boolean)>}
      */
-    #awaitedProperties = [];
+    #accumulatedProperties = {};
 
-    /** Initialize the logic required for {@link onAllAttributesSet} and {@link onAttributeSet}.
-     * This is in addition to the {@link attributeChangedCallback} which is responsible for calling {@link #handleAttributeChangedCallback}. */
+    /** Initialize the logic required for {@link onAllAttributesSet} and {@link onAttributeSet}. This is in addition to the {@link attributeChangedCallback} which is responsible for calling {@link handleAttributeChangedCallback}. */
     #initOnAttributeChanges() {
-        // List out all observed attributes that are set so their value can be awaited
+        for (const attrName of this.observedAttribute) {
+            const isSet = !!this.attributes.getNamedItem(attrName);
 
-        /** @type string[] */
-        const observed = this.constructor?.observedAttributes || [];
-
-        this.#awaitedAttributes = observed.filter((attrName) => {
-            return !!this.attributes.getNamedItem(attrName);
-        });
+            if (isSet) {
+                // Attribute is set and needs to be awaited
+                this.#awaitedAttributes.push(attrName);
+            } else {
+                const config = this.attributeConfigs[attrName] ?? {};
+                if (config?.type == 'boolean') {
+                    this.#accumulatedProperties[attrName] = false;
+                } else if ('default' in config) {
+                    this.#accumulatedProperties[attrName] = config.default;
+                }
+            }
+        }
     }
 
     /**
-     * Handle the attribute change internally, either accumulating the changes to call {@link onAllAttributesSet}, or once all attributes are set, call {@link onAttributeChange} for each change.
+     * Handle the attribute change internally, either accumulating the changes to call {@link onAllAttributesSet}, or after all attributes are set, call {@link onAttributeChange} for each change.
      *
      * @param {string} name Name of the attribute which changed.
      * @param {string} oldValue Value of the attribute before the change.
      * @param {string} newValue Value of the attribute after the change.
      */
     #handleAttributeChangedCallback(name, oldValue, newValue) {
-        const oldProcessed = this.#preProcessAttribute(name, oldValue);
         const newProcessed = this.#preProcessAttribute(name, newValue);
 
         // Accumulating properties before calling onAllAttributesSet
-        if (this.#awaitedProperties !== null) {
+        if (this.#awaitedAttributes !== null) {
             // Accumulate property for later
-            this.#awaitedProperties[name] = newProcessed;
+            this.#accumulatedProperties[name] = newProcessed;
 
             // No longer awaiting this attribute, so remove
-            const awaitingIndex = this.#awaitedAttributes.indexOf(name);
-            if (awaitingIndex > -1) {
-                this.#awaitedAttributes.splice(awaitingIndex, 1);
-            }
+            this.#awaitedAttributes = this.#awaitedAttributes.filter((n) => n !== name);
 
             // If last property set, finish call to onAllAttributesSet
             if (this.#awaitedAttributes.length == 0) {
-                const withDefaults = {...this.constructor.defaultAttributes, ...this.#awaitedProperties};
-                this.onAllAttributesSet(withDefaults);
-                this.#awaitedProperties = null;
+                this.onAllAttributesSet(this.#accumulatedProperties);
+                this.#awaitedAttributes = null;
+                this.#accumulatedProperties = null;
             }
         }
         // All already set, this is a change
         else {
+            const oldProcessed = this.#preProcessAttribute(name, oldValue);
             this.onAttributeChange(name, oldProcessed, newProcessed);
         }
     }
@@ -410,7 +411,7 @@ export default class HTMLElementPlus extends HTMLElement {
     /**
      * Invoked once all observed attributes that will have a value or default are set. Called only once at load time. Values will be passed through {@link defaultAttributes} and {@link attributesParser}. Will only be called once after loading, after which {@link onAttributeChange} should be used.
      *
-     * @param {Object<string, *>[]} attributes - All observed attributes as key-value pairs where the key is the attribute name and the value the attribute's value.
+     * @param {Object<string, (string|number|boolean)>} attributes - All observed attributes as key-value pairs where the key is the attribute name and the value the attribute's value.
      */
     // eslint-disable-next-line no-unused-vars
     onAllAttributesSet(attributes) {
@@ -421,12 +422,74 @@ export default class HTMLElementPlus extends HTMLElement {
      * Invoke each time an observed attribute changes value. Unlike {@link attributeChangedCallback}, the values are pre-processed by {@link defaultAttributes} and {@link attributesParser}. Additionally, it is not invoked at load time, instead deferring this duty to {@link onAllAttributesSet}.
      *
      * @param {string} name - Name of the attribute.
-     * @param {*} oldValue - Attribute's previous value.
-     * @param {*} newValue - Attribute's new value.
+     * @param {(string|number)} oldValue - Attribute's previous value.
+     * @param {(string|number)} newValue - Attribute's new value.
      */
     // eslint-disable-next-line no-unused-vars
     onAttributeChange(name, oldValue, newValue) {
         /* empty */
+    }
+
+    // endregion
+    // region: REFLECTED INTERNALS STATE
+
+    /**
+     * Internal element in which to stores states for CSS.
+     *
+     * @type {ElementInternals}
+     */
+    #internals = null;
+
+    /**
+     * Configuration for the element internals states (used in CSS via :state() pseudo-class) that get reflected as properties in the class. Keys are the state name, values are a boolean indicating the initial state with `true` being present. See https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors for more details.
+     *
+     * @static
+     * @type {Object<string, boolean>}
+     */
+    static internalStates = {};
+
+    /**
+     * Configuration for the element internals states (used in CSS via :state() pseudo-class) that get reflected as properties in the class. Keys are the state name, values are a boolean indicating the initial state with `true` being present. See https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_states_and_custom_state_pseudo-class_css_selectors for more details.
+     *
+     * @readonly
+     * @type {Object<string, boolean>}
+     */
+    get internalStates() {
+        // @ts-ignore
+        return this.constructor?.internalStates || {};
+    }
+
+    /** Initialize the element internals states, creating the reflected properties and setting initial status. */
+    #initInternalStates() {
+        this.#internals = this.attachInternals();
+
+        for (let [stateName, initiallyPresent] of Object.entries(this.internalStates)) {
+            const propName = this.#addStateReflection(stateName);
+            this[propName] = initiallyPresent;
+        }
+    }
+
+    /**
+     * Add a state property to the component which reflects an internal element state.
+     *
+     * @param {string} stateName Name of the state.
+     * @returns {string} Name of the resulting property.
+     */
+    #addStateReflection(stateName) {
+        const propName = this.#snakeToCamel(stateName);
+
+        // Create getter
+        Object.defineProperty(this, propName, {
+            get() {
+                return this.#internals.states.has(stateName);
+            },
+            set(value) {
+                if (value) this.#internals.states.add(stateName);
+                else this.#internals.states.delete(stateName);
+            },
+        });
+
+        return propName;
     }
 
     // endregion

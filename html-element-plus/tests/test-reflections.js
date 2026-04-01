@@ -3,14 +3,23 @@
 import TestHTMLElementPlus from './TestHTMLElementPlus.js';
 
 class TestReflections extends TestHTMLElementPlus {
-    static reflectedAttributes = {
-        alpha: {},
-        bravo: {readOnly: true},
-        'charlie-delta': {},
-        present: {boolean: true},
-        unchanged: {boolean: true, readOnly: true},
-        unset: {},
-        internals: {state: true},
+    static attributeConfigs = {
+        alpha: {reflected: true},
+        bravo: {reflected: true, readOnly: true},
+        'charlie-delta': {reflected: true},
+        present: {reflected: true, type: 'boolean'},
+        unchanged: {reflected: true, type: 'boolean', readOnly: true},
+        unset: {reflected: true},
+        count: {reflected: true, type: 'number'},
+        nan: {reflected: true, type: 'number'},
+        unreflected: {},
+        'unset-default': {reflected: true, default: 'UNSET DEFAULT'},
+        'unset-number-default': {reflected: true, default: 9999, type: 'number'},
+        'unset-boolean-default': {reflected: true, default: true, type: 'boolean'},
+        'set-default': {reflected: true, default: 'DEFAULT'},
+        'count-default': {reflected: true, default: '123', type: 'number'},
+        nothing: {reflected: true},
+        'set-null': {reflected: true},
     };
 
     constructor() {
@@ -24,7 +33,15 @@ class TestReflections extends TestHTMLElementPlus {
         this.#testReadOnlyBoolean();
         this.#testUnset();
         this.#testUnreflected();
-        this.#testInternals();
+        this.#testNumberCasting();
+        this.#testNotANumber();
+        this.#testUnsetDefault();
+        this.#testUnsetNumberDefault();
+        this.#testUnsetBooleanDefault();
+        this.#testSetDefault();
+        this.#testNumberDefault();
+        this.#testNothing();
+        this.#setAttributeToNull();
     }
 
     #testSettableValue() {
@@ -122,36 +139,77 @@ class TestReflections extends TestHTMLElementPlus {
         else this.pass(label);
     }
 
-    #testInternals() {
-        const style = document.createElement('style');
-        style.textContent = `
-            #testInternals {
-                &:before {
-                    content: "❌ ";
-                }
-                &:after {
-                    content: " Failed - CSS State Not Applied";
-                }
-            }
+    #testNumberCasting() {
+        const label = 'Number Casting';
+        if (this?.count === 22) this.pass(label);
+        else this.fail(label, 'Unexpected Value');
+    }
 
-            :host(:state(internals)) {
-                #testInternals {
-                    &:before {
-                        content: "✅ ";
-                    }
-                    &:after {
-                        content: " Successful";
-                    }
-                }
-            }
-        `;
-        this.shadowRoot.appendChild(style);
+    #testNotANumber() {
+        const label = 'Not A Number Casting';
+        if (Number.isNaN(this?.nan)) this.pass(label);
+        else this.fail(label, 'Unexpected Value');
+    }
 
-        const div = document.createElement('div');
-        div.setAttribute('id', 'testInternals');
-        div.textContent = 'Element Internals State';
-        this.shadowRoot.appendChild(div);
-        this.internals = true;
+    #testUnsetDefault() {
+        const label = 'Unset Default';
+        if (this.getAttribute('unset-default') !== null) {
+            this.fail(label, 'Unset Default Attribute Was Set in HTML');
+        } else if (this.unsetDefault !== 'UNSET DEFAULT') {
+            this.fail(label, 'Default Not Returned');
+        } else {
+            this.pass(label);
+        }
+    }
+
+    #testUnsetNumberDefault() {
+        const label = 'Unset Number Default';
+        if (this.getAttribute('unset-number-default') !== null) {
+            this.fail(label, 'Unset Default Attribute Was Set in HTML');
+        } else if (this.unsetNumberDefault === '9999') {
+            this.fail(label, 'Default Number Not Parsed');
+        } else if (this.unsetNumberDefault !== 9999) {
+            this.fail(label, 'Default Not Returned or Unexpected Value');
+        } else {
+            this.pass(label);
+        }
+    }
+
+    #testUnsetBooleanDefault() {
+        const label = 'Unset Boolean Default';
+        if (this.hasAttribute('unset-boolean-default') !== false) {
+            this.fail(label, 'Attribute Was Present');
+        } else if (this.unsetBooleanDefault !== false) {
+            this.fail(label, 'Unexpected Value');
+        } else {
+            this.pass(label);
+        }
+    }
+
+    #testSetDefault() {
+        const label = 'Set Default';
+        if (this.setDefault === 'DEFAULT') this.fail(label, 'Default Used Even When Attribute Set');
+        else if (this.setDefault !== 'SET') this.fail(label, 'Wrong Value Returned');
+        else this.pass(label);
+    }
+
+    #testNumberDefault() {
+        const label = 'Number Casting of Default';
+        if (this.countDefault !== 123) this.fail(label, 'Unexpected Value');
+        else this.pass(label);
+    }
+
+    #testNothing() {
+        const label = 'No Default Not Set';
+        if (this.nothing !== null) this.fail(label, 'Not Null');
+        else this.pass(label);
+    }
+
+    #setAttributeToNull() {
+        const label = 'Null Removes Attribute';
+        this.setNull = null;
+        if (this.getAttribute('set-null') === null) this.pass(label);
+        else this.fail(label, 'Attribute Not Removed When Nulled');
     }
 }
 

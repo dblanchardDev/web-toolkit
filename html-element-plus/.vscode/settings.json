@@ -40,7 +40,7 @@
     "html.validate.styles": true,                // Lint style tag content in HTML
 
 
-    "js/ts.validate.enabled": false,            // Turn off built in validator - use eslint instead
+    // "js/ts.validate.enabled": false,            // Turn off built in validator - use eslint instead
 
 
     "markdown.validate.enabled": true,          // Validate links in markdown files

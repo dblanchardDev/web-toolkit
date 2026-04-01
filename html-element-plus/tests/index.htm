@@ -55,7 +55,16 @@
         ></test-reflections>
 
         <h2>Attribute Callbacks</h2>
-        <small>Expect 4 tests results</small>
-        <test-attribute-callbacks no-default="NO-DEFAULT" number="0"></test-attribute-callbacks>
+        <small>Expect 12 tests results</small>
+        <test-attribute-callbacks
+            string="STRING"
+            string-default-set="STRING-DEFAULT-SET"
+            string-to-null="TO-BE-NULL"
+            number="12.5"
+            number-to-null="74"
+            number-nan="abcd"
+            boolean-set
+            boolean-to-null
+        ></test-attribute-callbacks>
     </body>
 </html>

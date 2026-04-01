@@ -8,12 +8,31 @@ const compareDicts = (a, b) => {
 };
 
 class TestAttributeCallbacks extends TestHTMLElementPlus {
-    static observedAttributes = ['no-default', 'default', 'number', 'boolean', 'unset'];
+    static observedAttributes = [
+        'string',
+        'string-unset',
+        'string-default-set',
+        'string-default-unset',
+        'string-to-null',
+        'number',
+        'number-default',
+        'number-to-null',
+        'number-nan',
+        'boolean-unset',
+        'boolean-set',
+        'boolean-default',
+    ];
 
     static attributeConfigs = {
-        default: {default: 'DEFAULT'},
+        string: {},
+        'string-default-set': {default: 'DEFAULT'},
+        'string-default-unset': {default: 'DEFAULT'},
         number: {type: 'number'},
-        boolean: {type: 'boolean'},
+        'number-default': {type: 'number', default: 55},
+        'number-to-null': {type: 'number'},
+        'number-nan': {type: 'number'},
+        'boolean-set': {type: 'boolean'},
+        'boolean-default': {type: 'boolean', default: true},
     };
 
     allLabel = 'On All Attributes Set';
@@ -26,17 +45,24 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
         this.attachShadow({mode: 'open'});
 
         this.allDiv = this.fail(this.allLabel, 'Did Not Run');
-        this.stringDiv = this.fail(this.stringLabel, 'Did Not Run');
-        this.numberDiv = this.fail(this.numberLabel, 'Did Not Run');
-        this.booleanDiv = this.fail(this.booleanLabel, 'Did Not Run');
-    }
 
-    connectedCallback() {
-        setTimeout(() => {
-            this.setAttribute('default', 'NEW');
-            this.setAttribute('number', '20');
-            this.setAttribute('boolean', '');
-        }, 100);
+        for (const key of [
+            'string',
+            'stringUnset',
+            'stringDefaultSet',
+            'stringDefaultUnset',
+            'stringToNull',
+            'number',
+            'numberDefault',
+            'numberToNull',
+            'numberNan',
+            'booleanUnset',
+            'booleanSet',
+        ]) {
+            const label = `On ${key} Attribute Change`;
+            this[`${key}Label`] = label;
+            this[`${key}Div`] = this.fail(label, 'Did Not Run');
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -48,10 +74,16 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
         this.allDiv.remove();
 
         const expected = {
-            'no-default': 'NO-DEFAULT',
-            default: 'DEFAULT',
-            number: 0,
-            boolean: false,
+            string: 'STRING',
+            'string-default-set': 'STRING-DEFAULT-SET',
+            'string-default-unset': 'DEFAULT',
+            'string-to-null': 'TO-BE-NULL',
+            number: 12.5,
+            'number-default': 55,
+            'number-to-null': 74,
+            'number-nan': NaN,
+            'boolean-set': true,
+            'boolean-default': false,
         };
 
         if (compareDicts(expected, attributes)) {
@@ -62,33 +94,78 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
         }
     }
 
-    onAttributeChange(name, oldValue, newValue) {
-        let label;
+    connectedCallback() {
+        setTimeout(() => {
+            this.setAttribute('string', 'NEW-STRING');
+            this.setAttribute('string-unset', 'NEW-STRING-UNSET');
+            this.removeAttribute('string-default-set');
+            this.setAttribute('string-default-unset', 'NEW-STRING-DEFAULT-UNSET');
+            this.removeAttribute('string-to-null');
+            this.setAttribute('number', 123.456);
+            this.setAttribute('number-default', 12);
+            this.removeAttribute('number-to-null');
+            this.setAttribute('number-nan', 'xyz');
+            this.setAttribute('boolean-unset', '');
+            this.removeAttribute('boolean-set');
+        }, 100);
+    }
 
+    onAttributeChange(name, oldValue, newValue) {
         switch (name) {
-            case 'default':
-                label = this.stringLabel;
-                this.stringDiv.remove();
-                if (oldValue != 'DEFAULT') this.fail(label, 'Unexpected Old Value');
-                else if (newValue !== 'NEW') this.fail(label, 'Unexpected New Value');
-                else this.pass(label);
+            case 'string':
+                this.#validate('string', name, oldValue, 'STRING', newValue, 'NEW-STRING');
+                break;
+            case 'string-unset':
+                this.#validate('stringUnset', name, oldValue, null, newValue, 'NEW-STRING-UNSET');
+                break;
+            case 'string-default-set':
+                this.#validate('stringDefaultSet', name, oldValue, 'STRING-DEFAULT-SET', newValue, 'DEFAULT');
+                break;
+            case 'string-default-unset':
+                this.#validate('stringDefaultUnset', name, oldValue, 'DEFAULT', newValue, 'NEW-STRING-DEFAULT-UNSET');
+                break;
+            case 'string-to-null':
+                this.#validateRemoved('stringToNull', name, oldValue, 'TO-BE-NULL', newValue, null);
                 break;
             case 'number':
-                label = this.numberLabel;
-                this.numberDiv.remove();
-                if (oldValue !== 0) this.fail(label, 'Unexpected Old Value');
-                else if (newValue !== 20) this.fail(label, 'Unexpected New Value');
-                else this.pass(label);
+                this.#validate('number', name, oldValue, 12.5, newValue, 123.456);
                 break;
-            case 'boolean':
-                label = this.booleanLabel;
-                this.booleanDiv.remove();
-                if (oldValue !== false) this.fail(label, 'Unexpected Old Value');
-                else if (newValue !== true) this.fail(label, 'Unexpected New Value');
-                else this.pass(label);
+            case 'number-default':
+                this.#validate('numberDefault', name, oldValue, 55, newValue, 12);
+                break;
+            case 'number-to-null':
+                this.#validateRemoved('numberToNull', name, oldValue, 74, newValue, null);
+                break;
+            case 'number-nan':
+                this.#validate('numberNan', name, Number.isNaN(oldValue), true, Number.isNaN(newValue), true);
+                break;
+            case 'boolean-unset':
+                this.#validate('booleanUnset', name, oldValue, false, newValue, true);
+                break;
+            case 'boolean-set':
+                this.#validate('booleanSet', name, oldValue, true, newValue, false);
                 break;
             default:
                 this.fail('Single Attribute Change', 'Unexpected Name');
+        }
+    }
+
+    #validate(key, name, oldValue, oldExpect, newValue, newExpect) {
+        const label = this[`${key}Label`];
+
+        if (oldValue != oldExpect) this.fail(label, 'Unexpected Old Value');
+        else if (newValue !== newExpect) this.fail(label, 'Unexpected New Value');
+        else this.pass(label);
+
+        this[`${key}Div`].remove();
+    }
+
+    #validateRemoved(key, name, oldValue, oldExpect, newValue, newExpect) {
+        const label = this[`${key}Label`];
+        if (this.hasAttribute(name)) {
+            this.fail(label, 'Attribute Not Removed');
+        } else {
+            this.#validate(key, name, oldValue, oldExpect, newValue, newExpect);
         }
     }
 }

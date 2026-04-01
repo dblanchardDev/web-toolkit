@@ -143,7 +143,6 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
                 this.#validate('numberNan', name, Number.isNaN(oldValue), true, Number.isNaN(newValue), true);
                 break;
             case 'boolean-unset':
-                console.log(oldValue);
                 this.#validate('booleanUnset', name, oldValue, false, newValue, true);
                 break;
             case 'boolean-set':

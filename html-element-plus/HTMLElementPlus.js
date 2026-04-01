@@ -170,23 +170,27 @@ export default class HTMLElementPlus extends HTMLElement {
      * Pre-process an attribute value, applying the defaults and casting the type.
      *
      * @param {string} attrName Name of the attribute.
-     * @param {(string|number)} value Attribute's value that is to be processed, as read from the attribute.
+     * @param {?(string|number|boolean)} value Attribute's value that is to be processed, as read from the attribute.
      * @returns {*} The value after processing.
      */
     #preProcessAttribute(attrName, value) {
-        // BUG: Logic does not pre-process boolean attributes for observed
         const config = this.attributeConfigs[attrName] ?? {};
 
-        // Apply the default if need
-        if (value === null && 'default' in config) {
-            value = config.default;
-        }
+        if (config?.type == 'boolean') {
+            // Boolean based on presence (null is absent, other is present)
+            value = value !== null;
+        } else {
+            // Apply the default if need
+            if (value === null && 'default' in config) {
+                value = config.default;
+            }
 
-        // Cast the value if number or boolean
-        const type = config?.type ?? 'string';
-        if (type == 'number') {
-            // @ts-ignore
-            value = parseFloat(value);
+            // Cast the value if number or boolean
+            const type = config?.type ?? 'string';
+            if (type == 'number' && value !== null) {
+                // @ts-ignore
+                value = parseFloat(value);
+            }
         }
 
         return value;
@@ -348,18 +352,27 @@ export default class HTMLElementPlus extends HTMLElement {
     /**
      * Store each resulting property as it gets loaded in order to invoke {@link onAllAttributesSet}. Afterwards, this property gets set to null to release the memory usage.
      *
-     * @type {?Object<string, *>[]}
+     * @type {?Object<string, (string|number|boolean)>}
      */
-    #accumulatedProperties = [];
+    #accumulatedProperties = {};
 
     /** Initialize the logic required for {@link onAllAttributesSet} and {@link onAttributeSet}. This is in addition to the {@link attributeChangedCallback} which is responsible for calling {@link handleAttributeChangedCallback}. */
     #initOnAttributeChanges() {
-        // List out all observed attributes that are set so their value can be awaited
-        // BUG: Add unset defaults to awaited properties
-        // BUG: Add unset booleans to awaited properties (should be false)
-        this.#awaitedAttributes = this.observedAttribute.filter((attrName) => {
-            return !!this.attributes.getNamedItem(attrName);
-        });
+        for (const attrName of this.observedAttribute) {
+            const isSet = !!this.attributes.getNamedItem(attrName);
+
+            if (isSet) {
+                // Attribute is set and needs to be awaited
+                this.#awaitedAttributes.push(attrName);
+            } else {
+                const config = this.attributeConfigs[attrName] ?? {};
+                if (config?.type == 'boolean') {
+                    this.#accumulatedProperties[attrName] = false;
+                } else if ('default' in config) {
+                    this.#accumulatedProperties[attrName] = config.default;
+                }
+            }
+        }
     }
 
     /**
@@ -370,7 +383,6 @@ export default class HTMLElementPlus extends HTMLElement {
      * @param {string} newValue Value of the attribute after the change.
      */
     #handleAttributeChangedCallback(name, oldValue, newValue) {
-        const oldProcessed = this.#preProcessAttribute(name, oldValue);
         const newProcessed = this.#preProcessAttribute(name, newValue);
 
         // Accumulating properties before calling onAllAttributesSet
@@ -390,6 +402,7 @@ export default class HTMLElementPlus extends HTMLElement {
         }
         // All already set, this is a change
         else {
+            const oldProcessed = this.#preProcessAttribute(name, oldValue);
             this.onAttributeChange(name, oldProcessed, newProcessed);
         }
     }
@@ -397,7 +410,7 @@ export default class HTMLElementPlus extends HTMLElement {
     /**
      * Invoked once all observed attributes that will have a value or default are set. Called only once at load time. Values will be passed through {@link defaultAttributes} and {@link attributesParser}. Will only be called once after loading, after which {@link onAttributeChange} should be used.
      *
-     * @param {Object<string, (string|number)>[]} attributes - All observed attributes as key-value pairs where the key is the attribute name and the value the attribute's value.
+     * @param {Object<string, (string|number|boolean)>} attributes - All observed attributes as key-value pairs where the key is the attribute name and the value the attribute's value.
      */
     // eslint-disable-next-line no-unused-vars
     onAllAttributesSet(attributes) {

@@ -3,8 +3,9 @@
 import TestHTMLElementPlus from './TestHTMLElementPlus.js';
 
 const compareDicts = (a, b) => {
-    const keys = Object.keys(a);
-    return keys.length === Object.keys(b).length && keys.every((k) => Object.hasOwn(b, k) && a[k] === b[k]);
+    const setA = new Set(Object.entries(a).map(([k, v]) => `${k}␟${v}`));
+    const setB = new Set(Object.entries(b).map(([k, v]) => `${k}␟${v}`));
+    return setA.symmetricDifference(setB).size === 0;
 };
 
 class TestAttributeCallbacks extends TestHTMLElementPlus {
@@ -32,6 +33,7 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
         'number-to-null': {type: 'number'},
         'number-nan': {type: 'number'},
         'boolean-set': {type: 'boolean'},
+        'boolean-unset': {type: 'boolean'},
         'boolean-default': {type: 'boolean', default: true},
     };
 
@@ -83,6 +85,7 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
             'number-to-null': 74,
             'number-nan': NaN,
             'boolean-set': true,
+            'boolean-unset': false,
             'boolean-default': false,
         };
 
@@ -140,6 +143,7 @@ class TestAttributeCallbacks extends TestHTMLElementPlus {
                 this.#validate('numberNan', name, Number.isNaN(oldValue), true, Number.isNaN(newValue), true);
                 break;
             case 'boolean-unset':
+                console.log(oldValue);
                 this.#validate('booleanUnset', name, oldValue, false, newValue, true);
                 break;
             case 'boolean-set':

@@ -4,10 +4,15 @@ import HTMLElementPlus from '../HTMLElementPlus.js';
 
 class TestEventDispatcher extends HTMLElementPlus {
     connectedCallback() {
+        let args = ['TestEvent', this.getAttribute('detail')];
+
+        let bubbles = this.getAttribute('bubbles');
+        if (bubbles !== null) args.push(!!parseInt(bubbles, 10));
+
         if (this.hasAttribute('composed')) {
-            this.emitComposedEvent('TestEvent', 'not composed');
+            this.emitComposedEvent(...args);
         } else {
-            this.emitEvent('TestEvent', 'composed');
+            this.emitEvent(...args);
         }
     }
 }
@@ -21,16 +26,21 @@ class TestEvents extends HTMLElement {
     }
 
     connectedCallback() {
-        this.#test('Event', false);
-        this.#test('Composed Event', true);
+        this.#test('Event', false, 0);
+        this.#test('Composed Event', true, 0);
+        this.#test('Bubbling Event', false, 1);
+        this.#test('Composed & Bubbling Event', true, 1);
+        this.#test('Default Event', false, null);
+        this.#test('Composed Default Event', true, null);
     }
 
     /**
      * Run an emit test, adding the result to the HTML.
      * @param {string} label Display in test result
      * @param {boolean} composed Whether to use composed event.
+     * @param {?number} bubbles Whether the event should bubble
      */
-    #test(label, composed) {
+    #test(label, composed, bubbles) {
         // Add result
         let result = document.createElement('div');
         result.textContent = `❌ No ${label} Emitted`;
@@ -38,14 +48,27 @@ class TestEvents extends HTMLElement {
 
         // Create test event element and listen
         let dispatcher = document.createElement('test-event-dispatcher');
+        const detail = String(Math.random());
+        dispatcher.setAttribute('detail', detail);
 
         if (composed) {
             dispatcher.setAttribute('composed', '');
         }
 
+        let bubblesExpected = true;
+        if (bubbles !== null) {
+            dispatcher.setAttribute('bubbles', bubbles);
+            bubblesExpected = !!parseInt(bubbles, 10);
+        }
+
+        // Listen for the event and add element to dispatch
         dispatcher.addEventListener('TestEvent', (event) => {
-            if (composed && event.composed == false) {
-                result.textContent = `❌ Composed Event Was Not Composed`;
+            if (event.detail !== detail) {
+                result.textContent = `❌ ${label} – Detail Incorrect`;
+            } else if (event.composed !== composed) {
+                result.textContent = `❌ ${label} – Composed Option Incorrect`;
+            } else if (event.bubbles !== bubblesExpected) {
+                result.textContent = `❌ ${label} – Bubbles Option Incorrect`;
             } else {
                 result.textContent = `✅ ${label} Emitted`;
             }

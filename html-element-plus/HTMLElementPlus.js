@@ -158,7 +158,6 @@ export default class HTMLElementPlus extends HTMLElement {
      * @type {Object<string, AttributeConfig>}
      */
     get attributeConfigs() {
-        // @ts-ignore
         return this.constructor?.attributeConfigs ?? {};
     }
 
@@ -184,7 +183,6 @@ export default class HTMLElementPlus extends HTMLElement {
             // Cast the value if number or boolean
             const type = config?.type ?? 'string';
             if (type == 'number' && value !== null) {
-                // @ts-ignore
                 value = parseFloat(value);
             }
         }
@@ -339,7 +337,6 @@ export default class HTMLElementPlus extends HTMLElement {
      * @type {string[]}
      */
     get observedAttribute() {
-        // @ts-ignore
         return this.constructor?.observedAttributes || [];
     }
 
@@ -455,7 +452,6 @@ export default class HTMLElementPlus extends HTMLElement {
      * @type {Object<string, boolean>}
      */
     get internalStates() {
-        // @ts-ignore
         return this.constructor?.internalStates || {};
     }
 

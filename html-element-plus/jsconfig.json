@@ -2,9 +2,8 @@
     "compilerOptions": {
         "module": "ESNext",
         "target": "ESNext",
-        "checkJs": true,
-        "experimentalDecorators": false,
-        "allowSyntheticDefaultImports": false
+        "checkJs": false,
+        "experimentalDecorators": false
     },
     "exclude": [
         "node_modules",

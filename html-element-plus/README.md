@@ -5,6 +5,7 @@ HTML Element wrapper which adds various utility methods that simplify developmen
 - [Original HTMLElementPlus Project](#original-htmlelementplus-project)
 - [Usage](#usage)
 - [Features](#features)
+  - [HTML & CSS Templates & Rendering](#html--css-templates--rendering)
   - [Query Shadow DOM by Reference](#query-shadow-dom-by-reference)
   - [Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)
   - [Attribute Configuration](#attribute-configuration)
@@ -53,12 +54,45 @@ This tool should be compatible with the latest version of all modern evergreen b
 
 The following features are provided by the HTMLElementPlus class. This is in addition to those already provided by [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) and web component [custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes).
 
+- **[HTML & CSS Templates & Rendering](#html--css-templates--rendering)**: Define HTML and CSS contents within the custom component and have them rendered automatically.
 - **[Query Shadow DOM by Reference](#query-shadow-dom-by-reference)**: Quickly locate elements within your shadow DOM.
 - **[Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)**: Shortcut for dispatching events from the custom element.
 - **[Attribute Configuration](#attribute-configuration)**: Add type casting, reflection, and defaults to attributes.
 - **[Improved Observed Attribute Callbacks](#improved-observed-attribute-callbacks)**: Dedicated methods to detect loaded attributes and changes to attributes. These methods respect the [attribute configuration](#attribute-configuration) including defaults and type.
 - **[Reflected Internals States](#reflected-internals-states)**: Reflection of element internals state. Used in CSS with `:state()` pseudo-class.
 - **[Connected Callback Skipped on Move](#connected-callback-skipped-on-move)**: The _connectedCallback_ method will no longer be called when the custom element is simply moved.
+
+### HTML & CSS Templates & Rendering
+
+Define your custom element's HTML and CSS directly in the HTMLElementPlus and call its _render_ method to have it applied to the shadow root automatically.
+
+Simply define your HTML code within the _htmlContent_ static property, and your CSS code within the _cssContent_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor.
+
+```js
+import {HTMLElementPlus, html, css} from 'HTMLElementPlus.js';
+
+class MyComponent extends HTMLElementPlus {
+    constructor() {
+        super();
+        this.attachShadow({mode: 'open'});
+        this.render();
+    }
+
+    static htmlContent = html`
+        <div class="foobar">Hello World!</div>
+    `;
+
+    static cssContent = css`
+        .foobar {
+            color: blue;
+        }
+    `;
+}
+```
+
+### Template Literal Tags
+
+To enable IDEs to provide syntax highlighting and autocomplete for the HTML and CSS content properties, use the _html_ and _css_ template literal tags that are provided by HTMLElementPlus. Depending on your IDE, you may need to install an extension such as one for Lit syntax highlighting, which shares this template approach.
 
 ### Query Shadow DOM by Reference
 

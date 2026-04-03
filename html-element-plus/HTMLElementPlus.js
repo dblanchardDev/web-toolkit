@@ -10,13 +10,23 @@
 // TODO Await for DOM ready and attributes reflected
 
 /**
+ * Template literal tag which activates IDE syntax highlighting of HTML code in JavaScript.
+ */
+export const html = String.raw;
+
+/**
+ * Template literal tag which activates IDE syntax highlighting of CSS code in JavaScript.
+ */
+export const css = String.raw;
+
+/**
  * HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
  *
  * @class HTMLElementPlus
  * @typedef {HTMLElementPlus}
  * @extends {HTMLElement}
- */ //@ts-ignore
-export default class HTMLElementPlus extends HTMLElement {
+ */
+export class HTMLElementPlus extends HTMLElement {
     constructor() {
         super();
 
@@ -491,4 +501,59 @@ export default class HTMLElementPlus extends HTMLElement {
     }
 
     // endregion
+    // region: HTML/CSS RENDERING
+
+    /**
+     * HTML contents to be rendered when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     *
+     * @static
+     * @type {string}
+     */
+    static htmlContent = html``;
+
+    /**
+     * HTML contents to be rendered when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     *
+     * @readonly
+     * @type {string}
+     */
+    get htmlContent() {
+        return this.constructor.htmlContent;
+    }
+
+    /**
+     * CSS contents to be used for styling the {@link htmlContent} when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     *
+     * @static
+     * @type {string}
+     */
+    static cssContent = css``;
+
+    /**
+     * CSS contents to be used for styling the {@link htmlContent} when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     *
+     * @readonly
+     * @type {string}
+     */
+    get cssContent() {
+        return this.constructor.cssContent;
+    }
+
+    /** Automatically add the HTML stored in {@link htmlContent} to the shadow root and style it using the contents of {@link cssContent}. */
+    render() {
+        // Add the style sheet to the shadow root
+        const sheet = new CSSStyleSheet();
+        sheet.replaceSync(this.cssContent);
+        this.shadowRoot.adoptedStyleSheets = [sheet];
+
+        // Add the HTML to the shadow root
+        const template = document.createElement('template');
+        template.innerHTML = this.htmlContent;
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+    }
+
+    // endregion
 }
+
+// Provide a default export version.
+export default HTMLElementPlus;

@@ -3,12 +3,13 @@
 import {HTMLElementPlus, html, css} from '../HTMLElementPlus.js';
 
 class TestDirectRender extends HTMLElementPlus {
-    connectedCallback() {
+    constructor() {
+        super();
         this.attachShadow({mode: 'open'});
         this.render();
     }
 
-    static htmlContent = html`
+    static markup = html`
         <style>
             .cssStyle:before {
                 content: '❌ ';
@@ -18,7 +19,7 @@ class TestDirectRender extends HTMLElementPlus {
         <div class="cssStyle">CSS Content Applied</div>
     `;
 
-    static cssContent = css`
+    static styles = css`
         .cssStyle:before {
             content: '✅ ' !important;
         }

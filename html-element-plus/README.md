@@ -66,7 +66,7 @@ The following features are provided by the HTMLElementPlus class. This is in add
 
 Define your custom element's HTML and CSS directly in the HTMLElementPlus and call its _render_ method to have it applied to the shadow root automatically.
 
-Simply define your HTML code within the _htmlContent_ static property, and your CSS code within the _cssContent_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor.
+Simply define your HTML code within the _markup_ static property, and your CSS code within the _styles_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor.
 
 ```js
 import {HTMLElementPlus, html, css} from 'HTMLElementPlus.js';
@@ -78,11 +78,11 @@ class MyComponent extends HTMLElementPlus {
         this.render();
     }
 
-    static htmlContent = html`
+    static markup = html`
         <div class="foobar">Hello World!</div>
     `;
 
-    static cssContent = css`
+    static styles = css`
         .foobar {
             color: blue;
         }
@@ -90,9 +90,39 @@ class MyComponent extends HTMLElementPlus {
 }
 ```
 
-### Template Literal Tags
+> ✒️ **Template Literal Tags**
+>
+> To enable IDEs to provide syntax highlighting and autocomplete for the HTML and CSS content properties, use the _html_ and _css_ template literal tags that are provided by HTMLElementPlus. Depending on your IDE, you may need to install an extension such as one for Lit syntax highlighting, which shares this template approach.
 
-To enable IDEs to provide syntax highlighting and autocomplete for the HTML and CSS content properties, use the _html_ and _css_ template literal tags that are provided by HTMLElementPlus. Depending on your IDE, you may need to install an extension such as one for Lit syntax highlighting, which shares this template approach.
+#### Fetching HTML & CSS Fragments
+
+If the HTML or CSS fragments are lengthy and better stored in their own file, a URL() can be provided in place of the strings in the _markup_ and/or _styles_ static properties.
+
+The call to the _render_ method will now by asynchronous and should be awaited before accessing the shadow root contents. As asynchronous operations should not be in the constructor, the call to the render method should be moved to the _connectedCallback_ method.
+
+```js
+class MyComponent extends HTMLElementPlus {
+    constructor() {
+        super();
+        this.attachShadow({mode: 'open'});
+    }
+
+    async connectedCallback() {
+        await this.render();
+        this.shadowRoot.querySelector(...);
+    }
+
+    static markup = new URL('my-html-fragment.html', import.meta.url);
+
+    static styles = new URL('my-css-fragment.css', import.meta.url);
+}
+```
+
+> 🔗 **Relative URLs**
+>
+> When constructing a new URL() with a relative path, the base URL must be provided as the second argument. Use `import.meta.url` if the path is relative to the custom component's JavaScript file, or `document.baseURI` if relative to the document's URL (or [base URL](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/base) if set).
+
+The fetching of HTML and CSS fragments is cached and shared across instances of the HTMLElementPlus implementations. Therefore, the same file will only be fetched once and shared across all its users.
 
 ### Query Shadow DOM by Reference
 

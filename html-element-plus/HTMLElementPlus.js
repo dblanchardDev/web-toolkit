@@ -4,10 +4,16 @@
  * @since March 2026
  */
 
-// TODO HTML Rendering/Fetching
-// TODO CSS Rendering/Fetching
-// TODO Internationalization/dictionary structure?
-// TODO Await for DOM ready and attributes reflected
+/* TODO HTML/CSS Rendering/Fetching
+        - ✔️ Rendering directly from string to shadow root
+        - ✔️ Fetch HTML/CSS?
+        - Prevent calling render multiple times?
+*/
+// TODO Internationalization/dictionary structure
+// TODO Await for DOM ready and attributes reflected?
+// TODO Improve validation of user-provided contents
+
+// region: HTML/CSS FRAGMENTS & FETCHING
 
 /**
  * Template literal tag which activates IDE syntax highlighting of HTML code in JavaScript.
@@ -18,6 +24,76 @@ export const html = String.raw;
  * Template literal tag which activates IDE syntax highlighting of CSS code in JavaScript.
  */
 export const css = String.raw;
+
+/**
+ * Cache the promises for {@link fetchFragment} so that requesting the same resource does not result in another fetch. Do not use directly, always use {@link fetchFragment}.
+ *
+ * @type {{ markup: {string, Promise<string>}; styles: {string, Promise<string>}; dictionary: {string, Promise<object>}; }}
+ */
+let fragmentCache = {
+    markup: {},
+    styles: {},
+    dictionary: {},
+};
+
+/**
+ * Fetch an HTML or CSS fragment, or an i18n dictionary in JSON format, caching it for re-use across all users of HTMLElementPlus.
+ *
+ * @async
+ * @param {URL} url URL to the file to be fetched (or retrieved from the cache)
+ * @param {'markup' | 'styles' | 'dictionary'} type Type of file to fetch, either 'markup', 'styles', or 'dictionary'.
+ * @returns {(string | object)} Returns a string for HTML and CSS, and an Object for i18n content.
+ */
+async function fetchFragment(url, type) {
+    if (!['markup', 'styles', 'dictionary'].includes(type)) {
+        throw new TypeError(`Unable to fetch fragment as type '${type}' is not valid (markup, styles, dictionary).`);
+    }
+
+    // If not yet cached or getting fetched
+    if (!(url in fragmentCache[type])) {
+        // 1. Fetch the fragment
+        const promise = fetch(url)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP error while fetch fragment from '${url}': ${response.status} - ${response.statusText}.`,
+                    );
+                }
+
+                // 2. Check returned content type (avoid MIME sniffing)
+                const contentType = response.headers.get('content-type');
+                if (!contentType) throw new TypeError(`Missing Content-Type header for '${url}'.`);
+
+                const actualMime = contentType.split(';')[0].trim().toLowerCase();
+                const expectedMime = {markup: 'text/html', styles: 'text/css', dictionary: 'application/json'}[type];
+                if (actualMime !== expectedMime) {
+                    throw new TypeError(
+                        `MIME type mismatch on '${url}'. Expected '${expectedMime}', received '${actualMime}'.`,
+                    );
+                }
+
+                // 3. Obtain the contents
+                if (type == 'dictionary') return response.json();
+                else return response.text();
+            })
+            .then((data) => {
+                // 4. Check the returned contents
+                if (
+                    type == 'dictionary' &&
+                    (data === null || typeof data !== 'object' || data.constructor !== Object)
+                ) {
+                    throw new TypeError(`Fetched i18n contents from '${url}' does not contain an object.`);
+                }
+                return data;
+            });
+
+        fragmentCache[type][url] = promise;
+    }
+
+    return await fragmentCache[type][url];
+}
+
+// endregion
 
 /**
  * HTML Element wrapper which adds utility methods to simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
@@ -504,52 +580,80 @@ export class HTMLElementPlus extends HTMLElement {
     // region: HTML/CSS RENDERING
 
     /**
-     * HTML contents to be rendered when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     * HTML to be rendered when calling {@link render}. Can either be a string containing the HTML fragment itself, or a URL() to an HTML file containing the fragment. Changes to this value after calling {@link render} will be ignored.
      *
      * @static
-     * @type {string}
+     * @type {string | URL}
      */
-    static htmlContent = html``;
+    static markup = html``;
 
     /**
-     * HTML contents to be rendered when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     * HTML to be rendered when calling {@link render}. Can either be a string containing the HTML fragment itself, or a URL() to an HTML file containing the fragment. Changes to this value after calling {@link render} will be ignored.
      *
      * @readonly
-     * @type {string}
+     * @type {string | URL}
      */
-    get htmlContent() {
-        return this.constructor.htmlContent;
+    get markup() {
+        return this.constructor.markup;
     }
 
     /**
-     * CSS contents to be used for styling the {@link htmlContent} when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     * CSS to be used for styling the {@link template} when calling {@link render}. Can either be a string containing the CSS fragment itself, or a URL() to a CSS file containing the fragment. Changes to this value after calling {@link render} will be ignored.
      *
      * @static
-     * @type {string}
+     * @type {string | URL}
      */
-    static cssContent = css``;
+    static styles = css``;
 
     /**
-     * CSS contents to be used for styling the {@link htmlContent} when calling {@link render}. Changes to this value after calling {@link render} will be ignored.
+     * CSS to be used for styling the {@link template} when calling {@link render}. Can either be a string containing the CSS fragment itself, or a URL() to a CSS file containing the fragment. Changes to this value after calling {@link render} will be ignored.
      *
      * @readonly
-     * @type {string}
+     * @type {string | URL}
      */
-    get cssContent() {
-        return this.constructor.cssContent;
+    get styles() {
+        return this.constructor.styles;
     }
 
-    /** Automatically add the HTML stored in {@link htmlContent} to the shadow root and style it using the contents of {@link cssContent}. */
-    render() {
+    /** Automatically add the HTML stored in {@link template} to the shadow root and style it using the contents of {@link styles}.
+     *
+     * @async
+     */
+    async render() {
+        // Retrieve the contents
+        const [markup, styles] = await Promise.all([
+            this.#retrieveFragment('markup'),
+            this.#retrieveFragment('styles'),
+        ]);
+
         // Add the style sheet to the shadow root
         const sheet = new CSSStyleSheet();
-        sheet.replaceSync(this.cssContent);
+        sheet.replaceSync(styles);
         this.shadowRoot.adoptedStyleSheets = [sheet];
 
         // Add the HTML to the shadow root
         const template = document.createElement('template');
-        template.innerHTML = this.htmlContent;
+        template.innerHTML = markup;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+    }
+
+    /**
+     * Retrieve an HTML or CSS fragment, either getting it directly from this class' constructor if it is a string, or fetching it when its a URL.
+     *
+     * @async
+     * @param {'markup' | 'styles'} type Type of data to retrieve.
+     * @returns {string} The requested data.
+     */
+    async #retrieveFragment(type) {
+        const raw = this[type];
+
+        if (raw instanceof URL) {
+            return await fetchFragment(raw, type);
+        } else if (typeof raw === 'string') {
+            return raw;
+        }
+
+        throw new TypeError(`Definition for static property '${type}' was not a URL() nor a string.`);
     }
 
     // endregion

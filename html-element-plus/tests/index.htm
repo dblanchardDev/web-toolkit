@@ -19,6 +19,7 @@
         <script src="test-attribute-callbacks.js" type="module"></script>
         <script src="test-internals-state.js" type="module"></script>
         <script src="test-direct-render.js" type="module"></script>
+        <script src="test-fetched-render.js" type="module"></script>
 
         <style>
             h2 {
@@ -107,6 +108,12 @@
             <h2>Direct Rendering</h2>
             <small>Expect 2 test results</small>
             <test-direct-render></test-direct-render>
+        </section>
+
+        <section data-count="3">
+            <h2>Fetched Rendering</h2>
+            <small>Expect 3 test results</small>
+            <test-fetched-render></test-fetched-render>
         </section>
     </body>
 </html>

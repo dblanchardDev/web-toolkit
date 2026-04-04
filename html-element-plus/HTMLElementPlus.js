@@ -4,11 +4,6 @@
  * @since March 2026
  */
 
-/* TODO HTML/CSS Rendering/Fetching
-        - ✔️ Rendering directly from string to shadow root
-        - ✔️ Fetch HTML/CSS?
-        - Prevent calling render multiple times?
-*/
 // TODO Internationalization/dictionary structure
 // TODO Await for DOM ready and attributes reflected?
 // TODO Improve validation of user-provided contents
@@ -615,11 +610,22 @@ export class HTMLElementPlus extends HTMLElement {
         return this.constructor.styles;
     }
 
-    /** Automatically add the HTML stored in {@link template} to the shadow root and style it using the contents of {@link styles}.
+    /**
+     * Whether the component has already been rendered.
+     *
+     * @type {boolean}
+     */
+    #rendered = false;
+
+    /** Automatically add the HTML stored in {@link template} to the shadow root and style it using the contents of {@link styles}. Content will only be rendered once; calling this method a second time will do nothing.
      *
      * @async
      */
     async render() {
+        // Ensure rendering only occurs once
+        if (this.#rendered) return;
+        this.#rendered = true;
+
         // Retrieve the contents
         const [markup, styles] = await Promise.all([
             this.#retrieveFragment('markup'),

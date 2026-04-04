@@ -66,7 +66,7 @@ The following features are provided by the HTMLElementPlus class. This is in add
 
 Define your custom element's HTML and CSS directly in the HTMLElementPlus and call its _render_ method to have it applied to the shadow root automatically.
 
-Simply define your HTML code within the _markup_ static property, and your CSS code within the _styles_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor.
+Simply define your HTML code within the _markup_ static property, and your CSS code within the _styles_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor. Only the first call to _render_ will actually render the contents. Subsequent calls will be ignored.
 
 ```js
 import {HTMLElementPlus, html, css} from 'HTMLElementPlus.js';

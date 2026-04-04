@@ -6,7 +6,16 @@
 
 // TODO Internationalization/dictionary structure
 // TODO Await for DOM ready and attributes reflected?
-// TODO Improve validation of user-provided contents
+
+/**
+ * Check whether a value is an actual object (i.e. {}).
+ *
+ * @param {*} value Value to be checked.
+ * @returns {boolean} True if it is an object.
+ */
+function isObject(value) {
+    return value !== null && typeof value === 'object' && value.constructor === Object;
+}
 
 // region: HTML/CSS FRAGMENTS & FETCHING
 
@@ -73,10 +82,7 @@ async function fetchFragment(url, type) {
             })
             .then((data) => {
                 // 4. Check the returned contents
-                if (
-                    type == 'dictionary' &&
-                    (data === null || typeof data !== 'object' || data.constructor !== Object)
-                ) {
+                if (type == 'dictionary' && isObject(data) == false) {
                     throw new TypeError(`Fetched i18n contents from '${url}' does not contain an object.`);
                 }
                 return data;
@@ -239,7 +245,9 @@ export class HTMLElementPlus extends HTMLElement {
      * @type {Object<string, AttributeConfig>}
      */
     get attributeConfigs() {
-        return this.constructor?.attributeConfigs ?? {};
+        const value = this.constructor?.attributeConfigs ?? {};
+        if (!isObject(value)) throw new TypeError('Static attributeConfigs property must be an object (or null).');
+        return value;
     }
 
     /**
@@ -280,6 +288,11 @@ export class HTMLElementPlus extends HTMLElement {
         if (!isFrozen) Object.freeze(this.attributeConfigs);
 
         for (let [attrName, config] of Object.entries(this.attributeConfigs)) {
+            if (!isObject(config)) {
+                throw new TypeError(
+                    'Values inside the static attributeConfigs property object must also be an object (or null).',
+                );
+            }
             if (!isFrozen) Object.freeze(config);
 
             if (config?.reflected) {
@@ -418,7 +431,9 @@ export class HTMLElementPlus extends HTMLElement {
      * @type {string[]}
      */
     get observedAttribute() {
-        return this.constructor?.observedAttributes || [];
+        const value = this.constructor?.observedAttributes || [];
+        if (!Array.isArray(value)) throw new TypeError('Static observedAttribute property must be an array (or null).');
+        return value;
     }
 
     /**
@@ -533,7 +548,9 @@ export class HTMLElementPlus extends HTMLElement {
      * @type {Object<string, boolean>}
      */
     get internalStates() {
-        return this.constructor?.internalStates || {};
+        const value = this.constructor?.internalStates || {};
+        if (!isObject(value)) throw new TypeError('Static internalStates property must be an object (or null).');
+        return value;
     }
 
     /** Initialize the element internals states, creating the reflected properties and setting initial status. */

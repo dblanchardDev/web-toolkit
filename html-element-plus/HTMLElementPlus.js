@@ -5,7 +5,6 @@
  */
 
 // TODO Internationalization/dictionary structure
-// TODO Await for DOM ready and attributes reflected?
 
 /**
  * Check whether a value is an actual object (i.e. {}).

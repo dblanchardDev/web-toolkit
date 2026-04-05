@@ -700,19 +700,23 @@ export class HTMLElementPlus extends HTMLElement {
      *
      * @async
      * @param {'markup' | 'styles'} type Type of data to retrieve.
-     * @returns {() => string} The requested data.
+     * @returns {() => string} A factory function which when called returns the fragment string with i18n templates replaced.
      */
     async #retrieveStringFragment(type) {
         const raw = this[type];
 
         if (raw instanceof URL) {
-            // FIXME return a post substitution
+            // For URLs, fetch the fragment - returns function which applies i18n substitution
             return await fetchFragment(raw, type).then((fragment) => {
                 return () => {
-                    return fragment;
+                    // Replaces any `${i18n.myString}`
+                    return fragment.replace(/\$\{i18n\.(.*?)\}/gu, (_, key) => {
+                        return this.i18n[key];
+                    });
                 };
             });
         } else if (typeof raw === 'string') {
+            // Return the data itself, but through a function that call the getter to allow i18n to apply
             return () => {
                 return this[type];
             };

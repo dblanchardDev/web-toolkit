@@ -4,7 +4,7 @@
  * @since March 2026
  */
 
-// BUG: i18n dictionary not retrieved unless render is called
+// BUG: i18n dictionary not directly available until awaited render, even if all defined as built-ins
 
 /**
  * Check whether a value is an actual object (i.e. {}).
@@ -687,14 +687,20 @@ export class HTMLElementPlus extends HTMLElement {
         ]);
 
         // Add the style sheet to the shadow root
-        const sheet = new CSSStyleSheet();
-        sheet.replaceSync(stylesGetter());
-        this.shadowRoot.adoptedStyleSheets = [sheet];
+        const styles = stylesGetter();
+        if (styles) {
+            const sheet = new CSSStyleSheet();
+            sheet.replaceSync(styles);
+            this.shadowRoot.adoptedStyleSheets = [sheet];
+        }
 
         // Add the HTML to the shadow root
-        const template = document.createElement('template');
-        template.innerHTML = markupGetter();
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        const markup = markupGetter();
+        if (markup) {
+            const template = document.createElement('template');
+            template.innerHTML = markup;
+            this.shadowRoot.appendChild(template.content.cloneNode(true));
+        }
     }
 
     /**

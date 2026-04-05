@@ -139,6 +139,7 @@ class MyComponent extends HTMLElementPlus {
     constructor() {
         super();
         this.lang = "fr";
+        this.render();
     }
 
     static dictionaries = {
@@ -159,6 +160,9 @@ class MyComponent extends HTMLElementPlus {
     }
 }
 ```
+
+> 🎯 **Accessing _i18n_ directly**  
+> To access the _i18n_ dictionary directly from the code, the _render_ method must have been called (and awaited if any of its resources are fetched). Otherwise, the _i18n_ property will be empty. This allows for the language to be defined and the fetches to be awaited if necessary.
 
 ##### Fetching Dictionaries
 

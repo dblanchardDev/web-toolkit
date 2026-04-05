@@ -15,17 +15,21 @@ class TestI18nDictsFetched extends HTMLElementPlus {
         en: new URL('test-i18n-en.json', import.meta.url),
     };
 
-    markup = html`
-        <div>${this.i18n.defaultOnly}</div>
-        <div>${this.i18n.both}</div>
-        <div class="cssTest">CSS Content Internationalization</div>
-    `;
+    get markup() {
+        return html`
+            <div>${this.i18n.defaultOnly}</div>
+            <div>${this.i18n.both}</div>
+            <div class="cssTest">CSS Content Internationalization</div>
+        `;
+    }
 
-    styles = css`
-        .cssTest:before {
-            content: '${this.i18n.checkMark} ';
-        }
-    `;
+    get styles() {
+        return css`
+            .cssTest:before {
+                content: '${this.i18n.checkMark} ';
+            }
+        `;
+    }
 }
 
 customElements.define('test-i18n-dicts-fetched', TestI18nDictsFetched);

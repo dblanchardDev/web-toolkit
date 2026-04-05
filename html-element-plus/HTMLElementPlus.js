@@ -4,8 +4,6 @@
  * @since March 2026
  */
 
-// TODO Internationalization/dictionary structure
-
 /**
  * Check whether a value is an actual object (i.e. {}).
  *
@@ -680,7 +678,7 @@ export class HTMLElementPlus extends HTMLElement {
         this.#rendered = true;
 
         // Retrieve the contents
-        const [markup, styles] = await Promise.all([
+        const [markupGetter, stylesGetter] = await Promise.all([
             this.#retrieveStringFragment('markup'),
             this.#retrieveStringFragment('styles'),
             this.#deriveI18n(),
@@ -688,12 +686,12 @@ export class HTMLElementPlus extends HTMLElement {
 
         // Add the style sheet to the shadow root
         const sheet = new CSSStyleSheet();
-        sheet.replaceSync(styles);
+        sheet.replaceSync(stylesGetter());
         this.shadowRoot.adoptedStyleSheets = [sheet];
 
         // Add the HTML to the shadow root
         const template = document.createElement('template');
-        template.innerHTML = markup;
+        template.innerHTML = markupGetter();
         this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
@@ -702,17 +700,22 @@ export class HTMLElementPlus extends HTMLElement {
      *
      * @async
      * @param {'markup' | 'styles'} type Type of data to retrieve.
-     * @returns {string} The requested data.
+     * @returns {() => string} The requested data.
      */
     async #retrieveStringFragment(type) {
         const raw = this[type];
 
         if (raw instanceof URL) {
             // FIXME return a post substitution
-            return await fetchFragment(raw, type);
+            return await fetchFragment(raw, type).then((fragment) => {
+                return () => {
+                    return fragment;
+                };
+            });
         } else if (typeof raw === 'string') {
-            // FIXME return a post getter
-            return raw;
+            return () => {
+                return this[type];
+            };
         }
 
         throw new TypeError(`Definition for static property '${type}' was not a URL() nor a string.`);

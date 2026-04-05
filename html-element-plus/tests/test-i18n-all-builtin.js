@@ -21,17 +21,21 @@ class TestI18nAllBuiltin extends HTMLElementPlus {
         },
     };
 
-    markup = html`
-        <div>${this.i18n.defaultOnly}</div>
-        <div>${this.i18n.both}</div>
-        <div class="cssTest">CSS Content Internationalization</div>
-    `;
+    get markup() {
+        return html`
+            <div>${this.i18n.defaultOnly}</div>
+            <div>${this.i18n.both}</div>
+            <div class="cssTest">CSS Content Internationalization</div>
+        `;
+    }
 
-    styles = css`
-        .cssTest:before {
-            content: '${this.i18n.checkMark} ';
-        }
-    `;
+    get styles() {
+        return css`
+            .cssTest:before {
+                content: '${this.i18n.checkMark} ';
+            }
+        `;
+    }
 }
 
 customElements.define('test-i18n-all-builtin', TestI18nAllBuiltin);

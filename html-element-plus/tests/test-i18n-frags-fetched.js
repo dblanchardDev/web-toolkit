@@ -10,7 +10,7 @@ class TestI18nFragsFetched extends HTMLElementPlus {
         this.render();
     }
 
-    dictionaries = {
+    static dictionaries = {
         default: {
             defaultOnly: '✅ From Default Dictionary',
             both: '❌ From Language Dictionary – Obtained from Default',
@@ -21,9 +21,9 @@ class TestI18nFragsFetched extends HTMLElementPlus {
         },
     };
 
-    markup = new URL('test-i18n.html', import.meta.url);
+    static markup = new URL('test-i18n.html', import.meta.url);
 
-    styles = new URL('test-i18n.css', import.meta.url);
+    static styles = new URL('test-i18n.css', import.meta.url);
 }
 
 customElements.define('test-i18n-frags-fetched', TestI18nFragsFetched);

@@ -4,6 +4,8 @@
  * @since March 2026
  */
 
+// BUG: i18n dictionary not retrieved unless render is called
+
 /**
  * Check whether a value is an actual object (i.e. {}).
  *
@@ -710,7 +712,7 @@ export class HTMLElementPlus extends HTMLElement {
             return await fetchFragment(raw, type).then((fragment) => {
                 return () => {
                     // Replaces any `${i18n.myString}`
-                    return fragment.replace(/\$\{i18n\.(.*?)\}/gu, (_, key) => {
+                    return fragment.replace(/\$\{(.*?)\}/gu, (_, key) => {
                         return this.i18n[key];
                     });
                 };

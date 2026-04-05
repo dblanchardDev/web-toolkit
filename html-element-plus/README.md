@@ -130,19 +130,15 @@ A multilingual interface can be produced using the internationalization (i18n) d
 
 Each language dictionary should be defined in the static _dictionaries_ object property, with the key-value pairs being the language code and the key-term translations object, respectively. In addition to using language codes such as `en` and `fr`, the `default` language code can be used to define a default/fallback dictionary; which will be used if the requested language doesn't exist, or if the key isn't defined in the language specific dictionary.
 
-The HTML Element Plus will automatically compile the dictionary to be used and make it available in the _i18n_ property. The language is determined by reading the _lang_ attribute from the custom element, falling back to the document's _lang_`_ attribute.
-
-Within the _markdown_ and _styles_ static properties, use the `${key}` syntax to have it filled-in with the value from the _i18n_ property. Only single-level entries can be accessed.
+The HTML Element Plus will automatically compile the dictionary to be used and make it available in the _i18n_ instance property. The language is determined by reading the _lang_ attribute from the custom element, falling back to the document's _lang_`_ attribute.
 
 ```js
-import {HTMLElementPlus, html, css} from 'HTMLElementPlus.js';
+import HTMLElementPlus from 'HTMLElementPlus.js';
 
 class MyComponent extends HTMLElementPlus {
     constructor() {
         super();
-        this.attachShadow({mode: 'open'});
         this.lang = "fr";
-        this.render();
     }
 
     static dictionaries = {
@@ -158,15 +154,9 @@ class MyComponent extends HTMLElementPlus {
         }
     }
 
-    static markup = html`
-        <div class="foobar">${hello}</div>
-    `;
-
-    static styles = css`
-        .foobar:before {
-            content: ${check};
-        }
-    `;
+    sayHello() {
+        this.refs.greeting.textContent = this.i18n.hello;
+    }
 }
 ```
 
@@ -175,7 +165,7 @@ class MyComponent extends HTMLElementPlus {
 Similar to [fetching HTML & CSS fragments](#fetching-html--css-fragments), the dictionaries can be fetched from a JSON file. Each language should have its own dictionary, including the default dictionary. Only required dictionaries will be fetched.
 
 ```js
-import {HTMLElementPlus, html, css} from 'HTMLElementPlus.js';
+import HTMLElementPlus from 'HTMLElementPlus.js';
 
 class MyComponent extends HTMLElementPlus {
     // ...
@@ -188,6 +178,51 @@ class MyComponent extends HTMLElementPlus {
 
     // ...
 }
+```
+
+##### Using i18n Values in Built-In Fragments
+
+To use the values found in the resulting _i18n_ dictionary within HTML and CSS fragments that are embedded directly into the custom element class, use an instance getter instead of the static property to define your _markup_ and _styles_.
+
+Within these getters, you can freely access the _i18n_ dictionary on `this`.
+
+```js
+class MyComponent extends HTMLElementPlus {
+    // ...
+
+    get markup() {
+        return html`
+            <div>${this.i18n.hello}</div>
+        `;
+    }
+
+    get styles() {
+        return css`
+            .correct:before {
+                content: '${this.i18n.check}';
+            }
+        `;
+    }
+
+    // ...
+}
+```
+
+##### Using i18n Values in Fetched Fragments
+
+To use the values found in the resulting _i18n_ dictionary within [HTML and CSS fragments that are fetched](#fetching-html--css-fragments), use an embedded expression just like is used in JavaScript template literals, containing the name of the _i18n_ key.
+
+> 🪜 **Single Level Access**  
+> Only single-level entries can be accessed within the _i18n_ object. Accessing values of inner-objects or arrays is not supported.
+
+```html
+<div>${hello}</div>
+```
+
+```css
+    .correct:before {
+        content: '${check} ';
+    }
 ```
 
 ### Query Shadow DOM by Reference

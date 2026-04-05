@@ -10,14 +10,14 @@ class TestI18nAllFetched extends HTMLElementPlus {
         this.render();
     }
 
-    dictionaries = {
+    static dictionaries = {
         default: new URL('test-i18n-default.json', import.meta.url),
         en: new URL('test-i18n-en.json', import.meta.url),
     };
 
-    markup = new URL('test-i18n.html', import.meta.url);
+    static markup = new URL('test-i18n.html', import.meta.url);
 
-    styles = new URL('test-i18n.css', import.meta.url);
+    static styles = new URL('test-i18n.css', import.meta.url);
 }
 
 customElements.define('test-i18n-all-fetched', TestI18nAllFetched);

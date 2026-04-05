@@ -10,7 +10,7 @@ class TestI18nAllFetched extends HTMLElementPlus {
         this.render();
     }
 
-    dictionary = {
+    dictionaries = {
         default: new URL('test-i18n-default.json', import.meta.url),
         en: new URL('test-i18n-en.json', import.meta.url),
     };

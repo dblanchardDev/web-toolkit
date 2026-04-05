@@ -625,34 +625,34 @@ export class HTMLElementPlus extends HTMLElement {
     }
 
     /**
-     * Internationalization dictionary. Key-value pairs should be the language code and the word lookup, respectively. The language code can also be "default", which will be used when set language is unavailable or does not contain all words. The word lookup must be an object, containing key-word pairs.
+     * Internationalization dictionaries. Key-value pairs should be the language code and the word lookup, respectively. The language code can also be "default", which will be used when set language is unavailable or does not contain all words. The word lookup must be an object, containing key-word pairs.
      *
      * @static
      * @type {Object<string, Object<string, *> | URL>}
      */
-    static dictionary = {};
+    static dictionaries = {};
 
     /**
-     * Internationalization dictionary. Key-value pairs should be the language code and the word lookup, respectively. The language code can also be "default", which will be used when set language is unavailable or does not contain all words. The word lookup must be an object, containing key-word pairs.
+     * Internationalization dictionaries. Key-value pairs should be the language code and the word lookup, respectively. The language code can also be "default", which will be used when set language is unavailable or does not contain all words. The word lookup must be an object, containing key-word pairs.
      *
      * @readonly
      * @type {Object<string, Object<string, *> | URL>}
      */
-    get dictionary() {
-        const value = this.constructor.dictionary;
-        if (!isObject(value)) throw new TypeError('Static dictionary property must be an object (or null).');
+    get dictionaries() {
+        const value = this.constructor.dictionaries;
+        if (!isObject(value)) throw new TypeError('Static dictionaries property must be an object (or null).');
         return value;
     }
 
     /**
-     * Compiled internationalization dictionary for the current language, as derived from the static {@link dictionary}. Available privately only to prevent modification by the user. The {@link info} getter is used by users.
+     * Compiled internationalization dictionary for the current language, as derived from the static {@link dictionaries}. Available privately only to prevent modification by the user. The {@link info} getter is used by users.
      *
      * @type {Object<string, *>}
      */
     #i18n = {};
 
     /**
-     * Compiled internationalization dictionary for the current language, as derived from the static {@link dictionary}.
+     * Compiled internationalization dictionary for the current language, as derived from the static {@link dictionaries}.
      *
      * @readonly
      * @type {Object<string, *>}
@@ -732,17 +732,19 @@ export class HTMLElementPlus extends HTMLElement {
      */
     async #deriveI18n() {
         // Choose dictionaries to be processed
-        const rawDefault = this.dictionary?.default ?? {};
+        const rawDefault = this.dictionaries?.default ?? {};
 
         const langCode = this.lang || document.documentElement.lang || null;
-        const rawLang = this.dictionary?.[langCode] ?? {};
+        const rawLang = this.dictionaries?.[langCode] ?? {};
 
         // Fetch any URL based dictionaries
         const [defaultDict, langDict] = await Promise.all(
             [rawDefault, rawLang].map((dict) => {
                 if (dict instanceof URL) return fetchFragment(dict, 'dictionary');
                 else if (isObject(dict)) return dict;
-                throw new TypeError("An entry within the static property 'dictionary' was not a URl() nor an object.");
+                throw new TypeError(
+                    "An entry within the static property 'dictionaries' was not a URL() nor an object.",
+                );
             }),
         );
 

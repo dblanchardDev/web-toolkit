@@ -10,7 +10,7 @@ class TestI18nFragsFetched extends HTMLElementPlus {
         this.render();
     }
 
-    dictionary = {
+    dictionaries = {
         default: {
             defaultOnly: '✅ From Default Dictionary',
             both: '❌ From Language Dictionary – Obtained from Default',

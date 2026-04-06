@@ -4,8 +4,6 @@
  * @since March 2026
  */
 
-// TODO Internationalization/dictionary structure
-
 /**
  * Check whether a value is an actual object (i.e. {}).
  *
@@ -588,7 +586,7 @@ export class HTMLElementPlus extends HTMLElement {
     }
 
     // endregion
-    // region: HTML/CSS RENDERING
+    // region: HTML/CSS RENDERING + INTERNATIONALIZATION
 
     /**
      * HTML to be rendered when calling {@link render}. Can either be a string containing the HTML fragment itself, or a URL() to an HTML file containing the fragment. Changes to this value after calling {@link render} will be ignored.
@@ -627,11 +625,48 @@ export class HTMLElementPlus extends HTMLElement {
     }
 
     /**
-     * Whether the component has already been rendered.
+     * Internationalization dictionaries. Key-value pairs should be the language code and the word lookup, respectively. The language code can also be "default", which will be used when set language is unavailable or does not contain all words. The word lookup must be an object, containing key-word pairs.
      *
-     * @type {boolean}
+     * @static
+     * @type {Object<string, Object<string, *> | URL>}
      */
-    #rendered = false;
+    static dictionaries = {};
+
+    /**
+     * Internationalization dictionaries. Key-value pairs should be the language code and the word lookup, respectively. The language code can also be "default", which will be used when set language is unavailable or does not contain all words. The word lookup must be an object, containing key-word pairs.
+     *
+     * @readonly
+     * @type {Object<string, Object<string, *> | URL>}
+     */
+    get dictionaries() {
+        const value = this.constructor.dictionaries;
+        if (!isObject(value)) throw new TypeError('Static dictionaries property must be an object (or null).');
+        return value;
+    }
+
+    /**
+     * Compiled internationalization dictionary for the current language, as derived from the static {@link dictionaries}. Available privately only to prevent modification by the user. The {@link info} getter is used by users.
+     *
+     * @type {Object<string, *>}
+     */
+    #i18n = {};
+
+    /**
+     * Compiled internationalization dictionary for the current language, as derived from the static {@link dictionaries}.
+     *
+     * @readonly
+     * @type {Object<string, *>}
+     */
+    get i18n() {
+        return this.#i18n;
+    }
+
+    /**
+     * Promise which resolves once rendering has finished and is used to track whether rendering has begun.
+     *
+     * @type {{promise: Promise, resolve: function, reject: function }}
+     */
+    #rendering = null;
 
     /** Automatically add the HTML stored in {@link template} to the shadow root and style it using the contents of {@link styles}. Content will only be rendered once; calling this method a second time will do nothing.
      *
@@ -639,24 +674,34 @@ export class HTMLElementPlus extends HTMLElement {
      */
     async render() {
         // Ensure rendering only occurs once
-        if (this.#rendered) return;
-        this.#rendered = true;
+        if (this.#rendering) return this.#rendering.promise;
+        this.#rendering = Promise.withResolvers();
 
         // Retrieve the contents
-        const [markup, styles] = await Promise.all([
-            this.#retrieveFragment('markup'),
-            this.#retrieveFragment('styles'),
+        const [markupGetter, stylesGetter] = await Promise.all([
+            this.#retrieveStringFragment('markup'),
+            this.#retrieveStringFragment('styles'),
+            this.#deriveI18n(),
         ]);
 
         // Add the style sheet to the shadow root
-        const sheet = new CSSStyleSheet();
-        sheet.replaceSync(styles);
-        this.shadowRoot.adoptedStyleSheets = [sheet];
+        const styles = stylesGetter();
+        if (styles) {
+            const sheet = new CSSStyleSheet();
+            sheet.replaceSync(styles);
+            this.shadowRoot.adoptedStyleSheets = [sheet];
+        }
 
         // Add the HTML to the shadow root
-        const template = document.createElement('template');
-        template.innerHTML = markup;
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        const markup = markupGetter();
+        if (markup) {
+            const template = document.createElement('template');
+            template.innerHTML = markup;
+            this.shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        this.#rendering.resolve();
+        return this.#rendering.promise;
     }
 
     /**
@@ -664,18 +709,56 @@ export class HTMLElementPlus extends HTMLElement {
      *
      * @async
      * @param {'markup' | 'styles'} type Type of data to retrieve.
-     * @returns {string} The requested data.
+     * @returns {() => string} A factory function which when called returns the fragment string with i18n templates replaced.
      */
-    async #retrieveFragment(type) {
+    async #retrieveStringFragment(type) {
         const raw = this[type];
 
         if (raw instanceof URL) {
-            return await fetchFragment(raw, type);
+            // For URLs, fetch the fragment - returns function which applies i18n substitution
+            return await fetchFragment(raw, type).then((fragment) => {
+                return () => {
+                    // Replaces any `${i18n.myString}`
+                    return fragment.replace(/\$\{(.*?)\}/gu, (_, key) => {
+                        return this.i18n[key];
+                    });
+                };
+            });
         } else if (typeof raw === 'string') {
-            return raw;
+            // Return the data itself, but through a function that call the getter to allow i18n to apply
+            return () => {
+                return this[type];
+            };
         }
 
         throw new TypeError(`Definition for static property '${type}' was not a URL() nor a string.`);
+    }
+
+    /**
+     * Populate the {@link #i18n} (and therefore also {@link i18n}) with data from the dictionaries. The language codes will be obtained from this custom elements lang attribute, falling back to the document's lang attribute. In addition, the language specific dictionary will be merged with the default dictionary (if both present).
+     *
+     * @async
+     */
+    async #deriveI18n() {
+        // Choose dictionaries to be processed
+        const rawDefault = this.dictionaries?.default ?? {};
+
+        const langCode = this.lang || document.documentElement.lang || null;
+        const rawLang = this.dictionaries?.[langCode] ?? {};
+
+        // Fetch any URL based dictionaries
+        const [defaultDict, langDict] = await Promise.all(
+            [rawDefault, rawLang].map((dict) => {
+                if (dict instanceof URL) return fetchFragment(dict, 'dictionary');
+                else if (isObject(dict)) return dict;
+                throw new TypeError(
+                    "An entry within the static property 'dictionaries' was not a URL() nor an object.",
+                );
+            }),
+        );
+
+        // Set the i18n property to the combined dictionaries
+        this.#i18n = {...defaultDict, ...langDict};
     }
 
     // endregion

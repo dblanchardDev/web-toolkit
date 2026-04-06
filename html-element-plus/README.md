@@ -5,7 +5,7 @@ HTML Element wrapper which adds various utility methods that simplify developmen
 - [Original HTMLElementPlus Project](#original-htmlelementplus-project)
 - [Usage](#usage)
 - [Features](#features)
-  - [HTML & CSS Templates & Rendering](#html--css-templates--rendering)
+  - [HTML & CSS Rendering & Internationalization](#html--css-rendering--internationalization)
   - [Query Shadow DOM by Reference](#query-shadow-dom-by-reference)
   - [Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)
   - [Attribute Configuration](#attribute-configuration)
@@ -54,7 +54,7 @@ This tool should be compatible with the latest version of all modern evergreen b
 
 The following features are provided by the HTMLElementPlus class. This is in addition to those already provided by [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) and web component [custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes).
 
-- **[HTML & CSS Templates & Rendering](#html--css-templates--rendering)**: Define HTML and CSS contents within the custom component and have them rendered automatically.
+- **[HTML & CSS Rendering & Internationalization](#html--css-rendering--internationalization)**: Define HTML and CSS contents within the custom component and automatically apply internationalization.
 - **[Query Shadow DOM by Reference](#query-shadow-dom-by-reference)**: Quickly locate elements within your shadow DOM.
 - **[Custom Event Dispatching Shortcut](#custom-event-dispatching-shortcut)**: Shortcut for dispatching events from the custom element.
 - **[Attribute Configuration](#attribute-configuration)**: Add type casting, reflection, and defaults to attributes.
@@ -62,11 +62,17 @@ The following features are provided by the HTMLElementPlus class. This is in add
 - **[Reflected Internals States](#reflected-internals-states)**: Reflection of element internals state. Used in CSS with `:state()` pseudo-class.
 - **[Connected Callback Skipped on Move](#connected-callback-skipped-on-move)**: The _connectedCallback_ method will no longer be called when the custom element is simply moved.
 
-### HTML & CSS Templates & Rendering
+### HTML & CSS Rendering & Internationalization
 
 Define your custom element's HTML and CSS directly in the HTMLElementPlus and call its _render_ method to have it applied to the shadow root automatically.
 
-Simply define your HTML code within the _markup_ static property, and your CSS code within the _styles_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor. Only the first call to _render_ will actually render the contents. Subsequent calls will be ignored.
+Simply define your HTML code within the _markup_ static property, and your CSS code within the _styles_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor.
+
+> 📝 **Notes on Render**
+>
+> - Only the first call to _render_ will actually render the contents. Subsequent calls will be ignored.
+> - The _render_ method returns a promise which resolves once the content render functions are done. Subsequent calls return the same promise.
+> - When the promise resolves, the shadow root content is populated including the stylesheet (in _adoptedStyleSheets_). The [_i18n_](#internationalization) dictionary is also available. If none of the content is fetched, the shadow root may be available before the promise resolves, but this isn't guaranteed.
 
 ```js
 import {HTMLElementPlus, html, css} from 'HTMLElementPlus.js';
@@ -123,6 +129,111 @@ class MyComponent extends HTMLElementPlus {
 > When constructing a new URL() with a relative path, the base URL must be provided as the second argument. Use `import.meta.url` if the path is relative to the custom component's JavaScript file, or `document.baseURI` if relative to the document's URL (or [base URL](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/base) if set).
 
 The fetching of HTML and CSS fragments is cached and shared across instances of the HTMLElementPlus implementations. Therefore, the same file will only be fetched once and shared across all its users.
+
+#### Internationalization
+
+A multilingual interface can be produced using the internationalization (i18n) dictionaries.
+
+Each language dictionary should be defined in the static _dictionaries_ object property, with the key-value pairs being the language code and the key-term translations object, respectively. In addition to using language codes such as `en` and `fr`, the `default` language code can be used to define a default/fallback dictionary; which will be used if the requested language doesn't exist, or if the key isn't defined in the language specific dictionary.
+
+The HTML Element Plus will automatically compile the dictionary to be used and make it available in the _i18n_ instance property. The language is determined by reading the _lang_ attribute from the custom element, falling back to the document's _lang_`_ attribute.
+
+```js
+import HTMLElementPlus from 'HTMLElementPlus.js';
+
+class MyComponent extends HTMLElementPlus {
+    constructor() {
+        super();
+        this.lang = "fr";
+        this.render();
+    }
+
+    static dictionaries = {
+        default: {
+            hello: 'Hello!',
+            check: '✔️',
+        },
+        fr: {
+            hello: 'Bonjour!',
+        },
+        de: {
+            hello: 'Hallo!',
+        }
+    }
+
+    sayHello() {
+        this.refs.greeting.textContent = this.i18n.hello;
+    }
+}
+```
+
+> 🎯 **Accessing _i18n_ directly**  
+> To access the _i18n_ dictionary directly from the code, the _render_ method must have been called and awaited. Otherwise, the _i18n_ property will be empty. This allows for the language to be defined and the fetches to be awaited if necessary.
+
+##### Fetching Dictionaries
+
+Similar to [fetching HTML & CSS fragments](#fetching-html--css-fragments), the dictionaries can be fetched from a JSON file. Each language should have its own dictionary, including the default dictionary. Only required dictionaries will be fetched.
+
+```js
+import HTMLElementPlus from 'HTMLElementPlus.js';
+
+class MyComponent extends HTMLElementPlus {
+    // ...
+
+    static dictionaries = {
+        default: new URL('i18n/default.json', import.meta.url),
+        fr: new URL('i18n/fr.json', import.meta.url),
+        de: new URL('i18n/de.json', import.meta.url),
+    }
+
+    // ...
+}
+```
+
+##### Using i18n Values in Built-In Fragments
+
+To use the values found in the resulting _i18n_ dictionary within HTML and CSS fragments that are embedded directly into the custom element class, use an instance getter instead of the static property to define your _markup_ and _styles_.
+
+Within these getters, you can freely access the _i18n_ dictionary on `this`.
+
+```js
+class MyComponent extends HTMLElementPlus {
+    // ...
+
+    get markup() {
+        return html`
+            <div>${this.i18n.hello}</div>
+        `;
+    }
+
+    get styles() {
+        return css`
+            .correct:before {
+                content: '${this.i18n.check}';
+            }
+        `;
+    }
+
+    // ...
+}
+```
+
+##### Using i18n Values in Fetched Fragments
+
+To use the values found in the resulting _i18n_ dictionary within [HTML and CSS fragments that are fetched](#fetching-html--css-fragments), use an embedded expression just like is used in JavaScript template literals, containing the name of the _i18n_ key.
+
+> 🪜 **Single Level Access**  
+> Only single-level entries can be accessed within the _i18n_ object. Accessing values of inner-objects or arrays is not supported.
+
+```html
+<div>${hello}</div>
+```
+
+```css
+    .correct:before {
+        content: '${check} ';
+    }
+```
 
 ### Query Shadow DOM by Reference
 

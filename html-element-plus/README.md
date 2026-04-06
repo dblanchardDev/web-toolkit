@@ -66,7 +66,13 @@ The following features are provided by the HTMLElementPlus class. This is in add
 
 Define your custom element's HTML and CSS directly in the HTMLElementPlus and call its _render_ method to have it applied to the shadow root automatically.
 
-Simply define your HTML code within the _markup_ static property, and your CSS code within the _styles_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor. Only the first call to _render_ will actually render the contents. Subsequent calls will be ignored.
+Simply define your HTML code within the _markup_ static property, and your CSS code within the _styles_ static property. To render the content, call the _render_ method after attaching the shadow in the constructor.
+
+> 📝 **Notes on Render**
+>
+> - Only the first call to _render_ will actually render the contents. Subsequent calls will be ignored.
+> - The _render_ method returns a promise which resolves once the content render functions are done. Subsequent calls return the same promise.
+> - When the promise resolves, the shadow root content is populated including the stylesheet (in _adoptedStyleSheets_). The [_i18n_](#internationalization) dictionary is also available. If none of the content is fetched, the shadow root may be available before the promise resolves, but this isn't guaranteed.
 
 ```js
 import {HTMLElementPlus, html, css} from 'HTMLElementPlus.js';
@@ -162,7 +168,7 @@ class MyComponent extends HTMLElementPlus {
 ```
 
 > 🎯 **Accessing _i18n_ directly**  
-> To access the _i18n_ dictionary directly from the code, the _render_ method must have been called (and awaited if any of its resources are fetched). Otherwise, the _i18n_ property will be empty. This allows for the language to be defined and the fetches to be awaited if necessary.
+> To access the _i18n_ dictionary directly from the code, the _render_ method must have been called and awaited. Otherwise, the _i18n_ property will be empty. This allows for the language to be defined and the fetches to be awaited if necessary.
 
 ##### Fetching Dictionaries
 

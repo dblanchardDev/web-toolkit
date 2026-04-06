@@ -4,8 +4,6 @@
  * @since March 2026
  */
 
-// BUG: i18n dictionary not directly available until awaited render, even if all defined as built-ins
-
 /**
  * Check whether a value is an actual object (i.e. {}).
  *
@@ -664,11 +662,11 @@ export class HTMLElementPlus extends HTMLElement {
     }
 
     /**
-     * Whether the component has already been rendered.
+     * Promise which resolves once rendering has finished and is used to track whether rendering has begun.
      *
-     * @type {boolean}
+     * @type {{promise: Promise, resolve: function, reject: function }}
      */
-    #rendered = false;
+    #rendering = null;
 
     /** Automatically add the HTML stored in {@link template} to the shadow root and style it using the contents of {@link styles}. Content will only be rendered once; calling this method a second time will do nothing.
      *
@@ -676,8 +674,8 @@ export class HTMLElementPlus extends HTMLElement {
      */
     async render() {
         // Ensure rendering only occurs once
-        if (this.#rendered) return;
-        this.#rendered = true;
+        if (this.#rendering) return this.#rendering.promise;
+        this.#rendering = Promise.withResolvers();
 
         // Retrieve the contents
         const [markupGetter, stylesGetter] = await Promise.all([
@@ -701,6 +699,9 @@ export class HTMLElementPlus extends HTMLElement {
             template.innerHTML = markup;
             this.shadowRoot.appendChild(template.content.cloneNode(true));
         }
+
+        this.#rendering.resolve();
+        return this.#rendering.promise;
     }
 
     /**

@@ -1,8 +1,8 @@
 <!-- spell-checker:ignore simmon -->
 
-# Web Toolkit
+# Minimalist Web Toolkit
 
-Various tools and wrappers I use regularly to simplify HTML/CSS/JavaScript web development. Includes HTMLElementPlus to simplify native web component development, and Remedy CSS to apply a simple CSS reset.
+Various tools and wrappers I use regularly to simplify HTML/CSS/JavaScript web development. All these tools are lightweight and use a modern ECMAScript 2024+ approach.
 
 ## Tools
 

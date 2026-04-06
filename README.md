@@ -7,7 +7,7 @@ Various tools and wrappers I use regularly to simplify HTML/CSS/JavaScript web d
 ## Tools
 
 - [**DOM Ready**](./dom-ready/README.md): Simple promised based way to await for the DOM content to be loaded.
-- [**HTML Element Plus**](./html-element-plus/README.md): HTML Element wrapper which adds various utility methods that simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
+- [**HTML Element Plus**](./html-element-plus/README.md): HTML Element wrapper adds various utility methods that simplify development of native web components, thus reducing the need for heavier frameworks and code building when developing simpler websites and applications.
 - [**Remedy CSS**](./remedy-css/README.md): A slightly modified version of [Jen Simmon's CSS Remedy](https://github.com/jensimmons/cssremedy), a simple CSS reset.
 
 ## Licenses

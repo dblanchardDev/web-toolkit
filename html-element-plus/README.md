@@ -1,6 +1,8 @@
 # HTML Element Plus
 
-HTML Element wrapper which adds various utility methods that simplify development of native web components. Reduces the need for heavier frameworks and building code when developing simpler websites.
+HTML Element wrapper adds various utility methods that simplify development of native web components, thus reducing the need for heavier frameworks and code building when developing simpler websites and applications. Coming in a 32KBs, this lightweight tool tries to provide help were needed, without doing too much or bloating projects.
+
+This tool uses a modern ECMAScript 2024+ approach and does its best to follow the same patterns used in native HTML elements.
 
 - [Original HTMLElementPlus Project](#original-htmlelementplus-project)
 - [Usage](#usage)
